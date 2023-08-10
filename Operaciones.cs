@@ -16,7 +16,6 @@ namespace AST
     bool Evaluar();
     
     }
- 
     //token definido 
     public class tokenDefinition 
     {
@@ -58,7 +57,7 @@ namespace AST
             }
             catch (System.Exception)
             {
-                throw new ArgumentException("LEXICAL ERROR : " + Value + "id not valid token");
+                throw new ArgumentException("LEXICAL ERROR : " + Value + "is not valid token");
             }
         }
       
@@ -70,10 +69,13 @@ namespace AST
         {
             this.valor = valor;
         }
-        public void  evaluar( List<tokenDefinition> toks)
+        public  void Evaluar( List<tokenDefinition> toks)
         {
         
-                if(char.IsNumber(Value[0]));
+                if(char.IsNumber(Value[0]))
+                {
+
+                }
             else
             {
                 throw new ArgumentException("LEXICAL ERROR : " + Value + "is not valid token" );
@@ -114,10 +116,18 @@ namespace AST
         }
       
     }
+    public class tokenFuncionPrint : tokenDefinition
+    {
+        public tokenFuncionPrint (TokenTypes Types ,string Value) : base (Types , Value){}
+
+        public void Evaluar ()
+        {
+            Console.WriteLine(metodos.evaluador)
+        }
+    }
 
    public class TokenFuncionCos : tokenDefinition , Itoken
    {
-       
         public tokenNumero numero ;
     //voy a coger ese string value y lo voy  a tokenizar 
    
@@ -125,7 +135,20 @@ namespace AST
 
        public double Evaluar()
         {
-            return Math.Cos(metodos.evaluador(numero.Value ,0));
+            if (numero.Value == null)
+            {
+                throw new ArgumentException("this function takes a parameter");
+            }
+            try
+            {
+                 return Math.Cos(metodos.evaluador(numero.Value ,0));
+            }
+            catch (System.Exception)
+            {
+                
+                throw new ArgumentException("SEMANTIC ERROR : the cos function can only work with numbers");
+            }
+            
         }
         
    }
@@ -138,7 +161,19 @@ namespace AST
 
        public double Evaluar()
         {
-            return Math.Sin(metodos.evaluador(numero.Value ,0));
+             if (numero.Value == null)
+            {
+                throw new ArgumentException("this function takes a parameter");
+            }
+            try
+            {
+                return Math.Sin(metodos.evaluador(numero.Value ,0));
+            }
+            catch (System.Exception)
+            {
+                
+                throw new ArgumentException("SEMANTIC ERROR : the SIN function can only work with numbers");
+            }
         }
         
    }
@@ -151,7 +186,19 @@ namespace AST
 
        public double Evaluar()
         {
-            return Math.Tan(metodos.evaluador(numero.Value ,0));
+             if (numero.Value == null)
+            {
+                throw new ArgumentException("this function takes a parameter");
+            }
+            try
+            {
+                 return Math.Tan(metodos.evaluador(numero.Value ,0));
+            }
+            catch (System.Exception)
+            {
+                throw new ArgumentException("SEMANTIC ERROR : the TAN function can only work with numbers");
+            }
+           
         }
         
    }
@@ -164,7 +211,21 @@ namespace AST
         
        public double Evaluar()
         {
-            return Math.Pow(metodos.evaluador(izquierdo.Value ,0),metodos.evaluador(derecho.Value ,0));
+            if (izquierdo.Value == null || derecho.Value == null)
+            {
+                throw new ArgumentException("this function receives two parameters");
+            }
+            try
+            {
+                 return Math.Pow(metodos.evaluador(izquierdo.Value ,0),metodos.evaluador(derecho.Value ,0));
+            }
+            catch (System.Exception)
+            {
+                
+                throw new ArgumentException("SEMANTIC ERROR : the POW function can only work with numbers");
+             
+            }
+          
         }
         
    }
@@ -180,7 +241,20 @@ namespace AST
 
        public double Evaluar()
         {
-            return Math.Sqrt(metodos.evaluador(numero.Value,0));
+            if (numero.Value == null)
+            {
+                throw new ArgumentException("this function takes a parameter");
+            }
+            try
+            {
+                  return Math.Sqrt(metodos.evaluador(numero.Value,0));
+            }
+            catch (System.Exception)
+            {
+                
+                throw new ArgumentException("SEMANTIC ERROR : the Sqrt function can only work with numbers");
+            }
+           
         }
         
    }
@@ -192,7 +266,20 @@ namespace AST
        
        public double Evaluar()
         {
-            return Math.Max(metodos.evaluador(izquierdo.Value ,0) ,metodos.evaluador(derecho.Value ,0));
+            if (izquierdo.Value == null || derecho.Value == null)
+            {
+                throw new ArgumentException("this function takes two pararmeters");
+            }
+            try
+            {
+                return Math.Max(metodos.evaluador(izquierdo.Value ,0) ,metodos.evaluador(derecho.Value ,0));
+            }
+            catch (System.Exception)
+            {
+                
+                throw new ArgumentException("SEMANTIC ERROR : the Max function can only work with numbers");
+            }
+           
         }
         
    }
@@ -206,11 +293,23 @@ namespace AST
 
        public double Evaluar()
         {
-            return Math.Min(metodos.evaluador(izquierdo.Value ,0) ,metodos.evaluador(derecho.Value ,0));
+             if (izquierdo.Value == null || derecho.Value == null)
+            {
+                throw new ArgumentException("this function takes two pararmeters");
+            }
+            try
+            {
+                return Math.Min(metodos.evaluador(izquierdo.Value ,0) ,metodos.evaluador(derecho.Value ,0));
+            }
+            catch (System.Exception)
+            {
+                
+                throw new ArgumentException("SEMANTIC ERROR : the Min function can only work with numbers");
+            }
+            
         }
         
-   }
- //NODO DE OPERACIONES BINARIAS 
+   } 
     
     //NODO QUE REALIZA LA SUMA 
     public class NodoSuma : NodoOperacion , Itoken
@@ -222,7 +321,16 @@ namespace AST
         public NodoSuma(TokenTypes Types , string  value ,tokenNumero izquierdo , tokenNumero derecho ) :base (Types , value ,izquierdo , derecho){}
         public double Evaluar()
         {
-            return izquierdo.Evaluar() + derecho.Evaluar();
+            try
+            {
+                 return izquierdo.Evaluar() + derecho.Evaluar();
+            }
+            catch (System.Exception)
+            {
+                
+                throw new ArgumentException("SEMANTIC ERROR : the operador + can only work with numbers");
+            }
+           
         }
     }
     //NODO QUE REALIZA LA RESTA 
@@ -234,7 +342,16 @@ namespace AST
         public NodoResta(TokenTypes Types , string  value ,tokenNumero izquierdo ,tokenNumero derecho) :base (Types , value , izquierdo ,derecho ){}
         public double  Evaluar()
         {
-            return izquierdo.Evaluar() - derecho.Evaluar();
+            try
+            {
+                 return izquierdo.Evaluar() - derecho.Evaluar();
+            }
+            catch (System.Exception)
+            {
+                
+                throw new ArgumentException("SEMANTIC ERROR : the operador - can only work with numbers");
+            }
+          
         }
     }
     //NODO QUE REALIZA LA MULTIPLICACION 
@@ -246,7 +363,16 @@ namespace AST
         public NodoMulti(TokenTypes Types , string  value ,tokenNumero izquierdo ,tokenNumero derecho) :base (Types , value , izquierdo , derecho ){}
         public double  Evaluar()
         {
-            return izquierdo.Evaluar() * derecho.Evaluar();
+            
+            try
+            {
+                return izquierdo.Evaluar() * derecho.Evaluar();
+            }
+            catch (System.Exception)
+            {
+                
+                throw new ArgumentException("SEMANTIC ERROR : the operador * can only work with numbers");
+            }
         }
     }
     //NODO QUE REALIZA LA DIVISION 
@@ -259,7 +385,16 @@ namespace AST
     
         public double Evaluar()
         {
-            return izquierdo.Evaluar() / derecho.Evaluar();
+            try
+            {
+                 return izquierdo.Evaluar() / derecho.Evaluar();
+            }
+            catch (System.Exception)
+            {
+                
+                throw new ArgumentException("SEMANTIC ERROR : the operador / can only work with numbers");
+            }
+           
         }
     }
    //NODO DEL OPERADOR MENOR 
@@ -271,7 +406,16 @@ namespace AST
         public NodoMenor(TokenTypes Types , string  value,tokenNumero izquierdo ,tokenNumero derecho ) :base (Types , value ,izquierdo , derecho){}
         public bool Evaluar()
         {
-            return izquierdo.Evaluar() < derecho.Evaluar();
+      
+            try
+            {
+                  return izquierdo.Evaluar() < derecho.Evaluar();
+            }
+            catch (System.Exception)
+            {
+                
+                throw new ArgumentException("SEMANTIC ERROR : the operador < can only work with numbers");
+            }
         }
     }
     //NODO DEL OPERADOR MAYOR 
@@ -283,7 +427,16 @@ namespace AST
         public NodoMayor(TokenTypes Types , string  value ,tokenNumero izquierdo ,tokenNumero derecho ) :base (Types , value, izquierdo , derecho ){}
         public bool Evaluar()
         {
-            return izquierdo.Evaluar () > derecho.Evaluar();
+           
+            try
+            {
+                 return izquierdo.Evaluar () > derecho.Evaluar();
+            }
+            catch (System.Exception)
+            {
+                
+                throw new ArgumentException("SEMANTIC ERROR : the operador > can only work with numbers");
+            }
         }
     }
     //NODO DEL OPERADOR IGUAL 
@@ -295,7 +448,16 @@ namespace AST
         public NodoIgual(TokenTypes Types , string  value ,tokenNumero izquierdo ,tokenNumero derecho) :base (Types , value , izquierdo , derecho ){}
         public bool Evaluar()
         {
-            return izquierdo.Evaluar () == derecho.Evaluar();
+            
+            try
+            {
+                return izquierdo.Evaluar () == derecho.Evaluar();
+            }
+            catch (System.Exception)
+            {
+                
+                throw new ArgumentException("SEMANTIC ERROR : the operador == can only work with numbers  or string ");
+            }
         }
     }
      //NODO DEL OPERADOR MENOR IGUAL 
@@ -307,7 +469,16 @@ namespace AST
         public NodoMenorIgual(TokenTypes Types , string  value ,tokenNumero izquierdo ,tokenNumero derecho) :base (Types , value , izquierdo , derecho ){}
         public bool Evaluar()
         {
-            return izquierdo.Evaluar () <= derecho.Evaluar();
+            try
+            {
+                return izquierdo.Evaluar () <= derecho.Evaluar(); 
+            }
+            catch (System.Exception)
+            {
+                
+                throw new ArgumentException("SEMANTIC ERROR : the operador <= can only work with numbers");
+            }
+        
         }
     }
     //NODO DEL OPERADOR MAYOR IGUAL 
@@ -319,7 +490,16 @@ namespace AST
         public NodoMayorIgual(TokenTypes Types , string  value ,tokenNumero izquierdo ,tokenNumero derecho) :base (Types , value , izquierdo , derecho ){}
         public  bool Evaluar()
         {
-            return izquierdo.Evaluar () >= derecho.Evaluar();
+            try
+            {
+                return izquierdo.Evaluar () >= derecho.Evaluar();
+            }
+            catch (System.Exception)
+            {
+                
+                throw new ArgumentException("SEMANTIC ERROR : the operador >= can only work with numbers");
+            }
+            
         }
     }
      //NODO DEL OPERADOR DISTINTO 
@@ -331,7 +511,16 @@ namespace AST
         public NodoDistinto(TokenTypes Types , string  value ,tokenNumero izquierdo ,tokenNumero derecho) :base (Types , value ,izquierdo , derecho ){}
         public bool Evaluar()
         {
-            return izquierdo.Evaluar () != derecho.Evaluar();
+            try
+            {
+                return izquierdo.Evaluar () != derecho.Evaluar();
+            }
+            catch (System.Exception)
+            {
+                
+                throw new ArgumentException("SEMANTIC ERROR : the operador != can only work with numbers or string");
+            }
+            
         }
     }
     public class NodoOperacionL 
@@ -361,7 +550,16 @@ namespace AST
 
         public bool Evaluar()
         {
-            return izquierdo.Evaluar() == derecho.Evaluar();
+            
+            try
+            {
+                return izquierdo.Evaluar() == derecho.Evaluar();
+            }
+            catch (System.Exception)
+            {
+                
+                throw new ArgumentException("SEMANTIC ERROR : the operador == can only work with numbers or string");
+            }
         }
     }
     public class NodoDistLit :NodoOperacionL ,Iboolean
@@ -375,7 +573,16 @@ namespace AST
 
         public bool Evaluar()
         {
-            return izquierdo.Evaluar() != derecho.Evaluar();
+          
+            try
+            {
+                 return izquierdo.Evaluar() != derecho.Evaluar();
+            }
+            catch (System.Exception)
+            {
+                
+                throw new ArgumentException("SEMANTIC ERROR : the operador != can only work with numbers or string");
+            }
         }
     }
     //le falta el metodo que me evalua 
@@ -409,7 +616,17 @@ public class TernariaNum
         }
         
     }
-    
+
+ public class funcion 
+ {
+    public string name ;
+
+    public string value ;
+
+
+
+
+ }   
 }
 
 
