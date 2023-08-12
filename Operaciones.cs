@@ -5,7 +5,7 @@ namespace AST
     //tipos de token que hay 
     public enum TokenTypes
     {
-     Keyword , Identifier , Number , Operator, Punctuation , Literal
+     Keyword , Identifier , Number , Operator, Punctuation , Literal ,Condicional , raiz
     } 
    public interface  Itoken  
    {
@@ -19,7 +19,7 @@ namespace AST
     //token definido 
     public class tokenDefinition 
     {
-        List<tokenDefinition> tokens ;
+       public List<tokenDefinition> tokens = new List<tokenDefinition>();
         public TokenTypes Type {get ;  set ;}
         public string Value {get ;  set ;}
 
@@ -32,12 +32,12 @@ namespace AST
     }
    public class NodoOperacion : tokenDefinition  
        {
-      
-        public static  tokenNumero izquierdo {get ; set;}
-        public static tokenNumero derecho{get ; set ;} 
-
-        public NodoOperacion(TokenTypes Type , string  Value , tokenNumero izquierdo , tokenNumero  derecho) : base(Type , Value)
+        public static  List<tokenDefinition> izquierdo {get ;set;}
+        public static List<tokenDefinition> derecho {get ; set;}
+        
+        public NodoOperacion(TokenTypes Type , string  Value ,List<tokenDefinition> izquierdo , List<tokenDefinition> derecho ) : base(Type , Value)
         {
+    
             izquierdo = izquierdo;
             derecho = derecho;
         }
@@ -65,11 +65,11 @@ namespace AST
     public class tokenIdentidad : tokenDefinition    
     {
         public tokenDefinition valor;
-        public tokenIdentidad(TokenTypes Type , string Value ): base (Type , Value)
+        public tokenIdentidad(TokenTypes Type , string Value ,tokenDefinition valor): base (Type , Value)
         {
             this.valor = valor;
         }
-        public  void Evaluar( List<tokenDefinition> toks)
+        public string Evaluar( List<tokenDefinition> toks)
         {
         
                 if(char.IsNumber(Value[0]))
@@ -87,21 +87,19 @@ namespace AST
                       throw new ArgumentException("LEXICAL ERROR : " + Value + "is not valid token  , this identity already exists in the context");
                     }
                 }
-               
+               return valor.Value;
         }    
       
     }
     public class tokenAsignacion : tokenDefinition
     {
-        public tokenIdentidad  identidad ;
-        public tokenDefinition  definicion;
+        
         public TokenTypes Types;
         public string Value;
 
         public tokenAsignacion(TokenTypes Types , string Value , tokenIdentidad identidad , tokenDefinition definicion) : base(Types , Value )
         {
-            this.identidad = identidad ;
-            this.definicion = definicion;
+          
         }
 
 
@@ -118,30 +116,34 @@ namespace AST
     }
     public class tokenFuncionPrint : tokenDefinition
     {
-        public tokenFuncionPrint (TokenTypes Types ,string Value) : base (Types , Value){}
+      
+        public tokenFuncionPrint (TokenTypes Types ,string Value ) : base (Types , Value)
+        {
+            
+        }
 
         public void Evaluar ()
         {
-            Console.WriteLine(metodos.evaluador)
+            Console.WriteLine(metodos.EvaluadorPrint(tokens).Value);
         }
     }
-
-   public class TokenFuncionCos : tokenDefinition , Itoken
+   public class TokenFuncionCos : tokenDefinition, Itoken
    {
-        public tokenNumero numero ;
+        
     //voy a coger ese string value y lo voy  a tokenizar 
    
-        public TokenFuncionCos (TokenTypes Type ,string Value ,tokenNumero numero) : base(Type , Value){}
+        public TokenFuncionCos (TokenTypes Type ,string Value) : base(Type , Value){}
 
        public double Evaluar()
         {
-            if (numero.Value == null)
+            if (tokens == null)
             {
                 throw new ArgumentException("this function takes a parameter");
             }
             try
             {
-                 return Math.Cos(metodos.evaluador(numero.Value ,0));
+               
+                 return  Math.Cos(metodos.evaluador(tokens ,0 ,0));
             }
             catch (System.Exception)
             {
@@ -157,7 +159,7 @@ namespace AST
         public tokenNumero numero ;
    //voy a coger ese string value y lo voy  a tokenizar 
     
-        public TokenFuncionSin (TokenTypes Type ,string Value ,tokenNumero numero) : base(Type , Value){}
+        public TokenFuncionSin (TokenTypes Type ,string Value ) : base(Type , Value){}
 
        public double Evaluar()
         {
@@ -167,7 +169,7 @@ namespace AST
             }
             try
             {
-                return Math.Sin(metodos.evaluador(numero.Value ,0));
+                return Math.Sin(metodos.evaluador(tokens ,0 ,0));
             }
             catch (System.Exception)
             {
@@ -181,18 +183,18 @@ namespace AST
    {
 
    //voy a coger ese string value y lo voy  a tokenizar 
-      public tokenNumero  numero ;
-        public TokenFuncionTan (TokenTypes Type ,string Value , tokenNumero numero) : base(Type , Value){}
+      public List<tokenDefinition> numero ;
+        public TokenFuncionTan (TokenTypes Type ,string Value , List<tokenNumero> numero) : base(Type , Value){}
 
        public double Evaluar()
         {
-             if (numero.Value == null)
+             if (numero == null)
             {
                 throw new ArgumentException("this function takes a parameter");
             }
             try
             {
-                 return Math.Tan(metodos.evaluador(numero.Value ,0));
+                 return Math.Tan(metodos.evaluador(tokens ,0 ,0));
             }
             catch (System.Exception)
             {
@@ -206,18 +208,22 @@ namespace AST
    {
    //voy a coger ese string value y lo voy  a tokenizar 
         
-    
-        public TokenFuncionPow (TokenTypes Type ,string Value ,tokenNumero izquierdo ,tokenNumero derecho ) : base(Type , Value ,izquierdo , derecho){}
+        
+        public TokenFuncionPow (TokenTypes Type ,string Value ,List<tokenDefinition> izquierdo ,List<tokenDefinition> derecho ) : base(Type , Value ,izquierdo , derecho){}
         
        public double Evaluar()
         {
-            if (izquierdo.Value == null || derecho.Value == null)
+            if (izquierdo == null || derecho == null)
             {
                 throw new ArgumentException("this function receives two parameters");
             }
             try
             {
-                 return Math.Pow(metodos.evaluador(izquierdo.Value ,0),metodos.evaluador(derecho.Value ,0));
+                tokenNumero a = new tokenNumero(TokenTypes.Number,metodos.evaluador(izquierdo ,0 ,0).ToString());
+                tokenNumero b = new tokenNumero (TokenTypes.Number ,metodos.evaluador(derecho ,0 ,0).ToString());
+                tokens.Add(a);
+                tokens.Add(b);
+                 return Math.Pow(a.Evaluar(),b.Evaluar());
             }
             catch (System.Exception)
             {
@@ -232,22 +238,22 @@ namespace AST
    public class TokenFuncionSqrt: tokenDefinition , Itoken
    {
    //voy a coger ese string value y lo voy  a tokenizar 
-        public  tokenNumero numero ;
-        public TokenFuncionSqrt (TokenTypes Type ,string Value ,tokenNumero numero) : base(Type , Value)
+        public List<tokenDefinition> p;
+        public TokenFuncionSqrt (TokenTypes Type ,string Value ,List<tokenDefinition> p) : base(Type , Value )
         {
-            this.numero = numero;
+            this.p = p;
         }
         
-
        public double Evaluar()
         {
-            if (numero.Value == null)
+            if (tokens == null)
             {
                 throw new ArgumentException("this function takes a parameter");
             }
             try
-            {
-                  return Math.Sqrt(metodos.evaluador(numero.Value,0));
+            {       tokenNumero a = new tokenNumero (TokenTypes.Number ,metodos.evaluador(p, 0 ,0).ToString());
+                    tokens.Add(a);
+                    return Math.Sqrt(double.Parse(a.Value));
             }
             catch (System.Exception)
             {
@@ -262,17 +268,22 @@ namespace AST
    {
    //voy a coger ese string value y lo voy  a tokenizar 
         
-        public TokenFuncionMax (TokenTypes Type ,string Value ,tokenNumero izquierdo , tokenNumero derecho ) : base(Type , Value , izquierdo , derecho){}
+        
+        public TokenFuncionMax (TokenTypes Type ,string Value , List<tokenDefinition> izquierdo , List<tokenDefinition> derecho ) : base(Type , Value ,izquierdo ,derecho ){}
        
        public double Evaluar()
         {
-            if (izquierdo.Value == null || derecho.Value == null)
+            if (izquierdo == null || derecho == null)
             {
                 throw new ArgumentException("this function takes two pararmeters");
             }
             try
             {
-                return Math.Max(metodos.evaluador(izquierdo.Value ,0) ,metodos.evaluador(derecho.Value ,0));
+                tokenNumero a = new tokenNumero(TokenTypes.Number,metodos.evaluador(izquierdo ,0 ,0).ToString());
+                tokenNumero b = new tokenNumero (TokenTypes.Number ,metodos.evaluador(derecho ,0 ,0).ToString());
+                tokens.Add(a);
+                tokens.Add(b);
+                return Math.Max(a.Evaluar() ,b.Evaluar());
             }
             catch (System.Exception)
             {
@@ -288,18 +299,23 @@ namespace AST
    //voy a coger ese string value y lo voy  a tokenizar 
         
      
-        public TokenFuncionMin (TokenTypes Type ,string Value ,tokenNumero izquierdo , tokenNumero derecho) : base(Type , Value , izquierdo , derecho){}
+        public TokenFuncionMin (TokenTypes Type ,string Value ,List<tokenDefinition> izquierdo , List<tokenDefinition> derecho) : base(Type , Value , izquierdo , derecho){}
        
 
        public double Evaluar()
         {
-             if (izquierdo.Value == null || derecho.Value == null)
+             if (izquierdo == null || Value == null)
             {
                 throw new ArgumentException("this function takes two pararmeters");
             }
             try
             {
-                return Math.Min(metodos.evaluador(izquierdo.Value ,0) ,metodos.evaluador(derecho.Value ,0));
+                tokenNumero a = new tokenNumero(TokenTypes.Number,metodos.evaluador(izquierdo ,0 ,0).ToString());
+                tokenNumero b = new tokenNumero (TokenTypes.Number ,metodos.evaluador(derecho ,0 ,0).ToString());
+                tokens.Add(a);
+                tokens.Add(b);
+                return Math.Min(a.Evaluar() ,b.Evaluar());
+            
             }
             catch (System.Exception)
             {
@@ -310,20 +326,25 @@ namespace AST
         }
         
    } 
-    
-    //NODO QUE REALIZA LA SUMA 
+      //NODO QUE REALIZA LA SUMA 
     public class NodoSuma : NodoOperacion , Itoken
     {
 
-        public static  tokenNumero izquierdo {get; private set;}
-        public static tokenNumero derecho {get ; private set;}
+        
 
-        public NodoSuma(TokenTypes Types , string  value ,tokenNumero izquierdo , tokenNumero derecho ) :base (Types , value ,izquierdo , derecho){}
+        public NodoSuma(TokenTypes Types , string  value ,List<tokenDefinition> izquierdo , List<tokenDefinition> derecho ) :base (Types , value ,izquierdo , derecho)
+        {
+           
+        }
         public double Evaluar()
         {
             try
             {
-                 return izquierdo.Evaluar() + derecho.Evaluar();
+                tokenNumero a = new tokenNumero(TokenTypes.Number,metodos.evaluador(izquierdo ,0 ,0).ToString());
+                tokenNumero b = new tokenNumero (TokenTypes.Number ,metodos.evaluador(derecho ,0 ,0).ToString());
+                tokens.Add(a);
+                tokens.Add(b);
+                 return a.Evaluar() + b.Evaluar();
             }
             catch (System.Exception)
             {
@@ -336,15 +357,21 @@ namespace AST
     //NODO QUE REALIZA LA RESTA 
     public class NodoResta :NodoOperacion , Itoken
     {
-        public static tokenNumero izquierdo {get; private set;}
-        public static tokenNumero derecho {get ; private set;}
+      
 
-        public NodoResta(TokenTypes Types , string  value ,tokenNumero izquierdo ,tokenNumero derecho) :base (Types , value , izquierdo ,derecho ){}
+        public NodoResta(TokenTypes Types , string  value ,List<tokenDefinition> izquierdo ,List<tokenDefinition>derecho) :base (Types , value , izquierdo ,derecho )
+        {
+           
+        }
         public double  Evaluar()
         {
             try
             {
-                 return izquierdo.Evaluar() - derecho.Evaluar();
+                tokenNumero a = new tokenNumero(TokenTypes.Number,metodos.evaluador(izquierdo ,0 ,0).ToString());
+                tokenNumero b = new tokenNumero (TokenTypes.Number ,metodos.evaluador(derecho ,0 ,0).ToString());
+                tokens.Add(a);
+                tokens.Add(b);
+                 return a.Evaluar() - b.Evaluar();
             }
             catch (System.Exception)
             {
@@ -357,16 +384,22 @@ namespace AST
     //NODO QUE REALIZA LA MULTIPLICACION 
     public class NodoMulti :NodoOperacion , Itoken
     {
-        public static tokenNumero izquierdo {get; private set;}
-        public static tokenNumero derecho {get ; private set;}
+       
 
-        public NodoMulti(TokenTypes Types , string  value ,tokenNumero izquierdo ,tokenNumero derecho) :base (Types , value , izquierdo , derecho ){}
+        public NodoMulti(TokenTypes Types , string  value ,List<tokenDefinition> izquierdo ,List<tokenDefinition> derecho) :base (Types , value , izquierdo , derecho )
+        {
+           
+        }
         public double  Evaluar()
         {
             
             try
             {
-                return izquierdo.Evaluar() * derecho.Evaluar();
+                tokenNumero a = new tokenNumero(TokenTypes.Number,metodos.evaluador(izquierdo ,0 ,0).ToString());
+                tokenNumero b = new tokenNumero (TokenTypes.Number ,metodos.evaluador(derecho ,0 ,0).ToString());
+                tokens.Add(a);
+                tokens.Add(b);
+                return a.Evaluar() * b.Evaluar();
             }
             catch (System.Exception)
             {
@@ -378,16 +411,21 @@ namespace AST
     //NODO QUE REALIZA LA DIVISION 
     public class NodoDivision :NodoOperacion , Itoken
     {
-       public static tokenNumero izquierdo {get; private set;}
-        public static tokenNumero derecho {get ; private set;}
-
-        public NodoDivision(TokenTypes Types , string  value ,tokenNumero izquierdo ,tokenNumero derecho) :base (Types , value , izquierdo , derecho ){}
+       
+        public NodoDivision(TokenTypes Types , string  value ,List<tokenDefinition> izquierdo ,List<tokenDefinition> derecho) :base (Types , value , izquierdo , derecho )
+        {
+           
+        }
     
         public double Evaluar()
         {
             try
             {
-                 return izquierdo.Evaluar() / derecho.Evaluar();
+                 tokenNumero a = new tokenNumero(TokenTypes.Number,metodos.evaluador(izquierdo ,0 ,0).ToString());
+                tokenNumero b = new tokenNumero (TokenTypes.Number ,metodos.evaluador(derecho ,0 ,0).ToString());
+                tokens.Add(a);
+                tokens.Add(b);
+                return a.Evaluar() / b.Evaluar();
             }
             catch (System.Exception)
             {
@@ -400,16 +438,22 @@ namespace AST
    //NODO DEL OPERADOR MENOR 
     public class NodoMenor :NodoOperacion , Iboolean
     {
-        public static  tokenNumero izquierdo {get; private set;}
-        public static tokenNumero derecho {get ; private set;}
-
-        public NodoMenor(TokenTypes Types , string  value,tokenNumero izquierdo ,tokenNumero derecho ) :base (Types , value ,izquierdo , derecho){}
+        
+        public NodoMenor(TokenTypes Types , string  value,List<tokenDefinition> izquierdo ,List<tokenDefinition> derecho ) :base (Types , value ,izquierdo , derecho)
+        {
+        
+        }
         public bool Evaluar()
         {
       
             try
             {
-                  return izquierdo.Evaluar() < derecho.Evaluar();
+                tokenNumero a = new tokenNumero(TokenTypes.Number,metodos.evaluador(izquierdo ,0 ,0).ToString());
+                tokenNumero b = new tokenNumero (TokenTypes.Number ,metodos.evaluador(derecho ,0 ,0).ToString());
+                tokens.Add(a);
+                tokens.Add(b);
+                return a.Evaluar() < b.Evaluar();
+                
             }
             catch (System.Exception)
             {
@@ -421,16 +465,22 @@ namespace AST
     //NODO DEL OPERADOR MAYOR 
      public class NodoMayor :NodoOperacion ,Iboolean
     {
-        public static  tokenNumero izquierdo {get; private set;}
-        public static tokenNumero derecho {get ; private set;}
+    
 
-        public NodoMayor(TokenTypes Types , string  value ,tokenNumero izquierdo ,tokenNumero derecho ) :base (Types , value, izquierdo , derecho ){}
+        public NodoMayor(TokenTypes Types , string  value ,List<tokenDefinition> izquierdo ,List<tokenDefinition> derecho) :base (Types , value, izquierdo , derecho )
+        {
+           
+        }
         public bool Evaluar()
         {
            
             try
             {
-                 return izquierdo.Evaluar () > derecho.Evaluar();
+                tokenNumero a = new tokenNumero(TokenTypes.Number,metodos.evaluador(izquierdo ,0 ,0).ToString());
+                tokenNumero b = new tokenNumero (TokenTypes.Number ,metodos.evaluador(derecho ,0 ,0).ToString());
+                tokens.Add(a);
+                tokens.Add(b);
+                 return a.Evaluar () > b.Evaluar();
             }
             catch (System.Exception)
             {
@@ -442,16 +492,22 @@ namespace AST
     //NODO DEL OPERADOR IGUAL 
      public class NodoIgual :NodoOperacion ,Iboolean
     {
-        public static tokenNumero izquierdo {get; private set;}
-        public static tokenNumero derecho {get ; private set;}
+       
 
-        public NodoIgual(TokenTypes Types , string  value ,tokenNumero izquierdo ,tokenNumero derecho) :base (Types , value , izquierdo , derecho ){}
+        public NodoIgual(TokenTypes Types , string  value ,List<tokenDefinition> izquierdo ,List<tokenDefinition> derecho) :base (Types , value , izquierdo , derecho )
+        {
+        }
         public bool Evaluar()
         {
             
             try
             {
-                return izquierdo.Evaluar () == derecho.Evaluar();
+                tokenNumero a = new tokenNumero(TokenTypes.Number,metodos.evaluador(izquierdo ,0 ,0).ToString());
+                tokenNumero b = new tokenNumero (TokenTypes.Number ,metodos.evaluador(derecho ,0 ,0).ToString());
+                tokens.Add(a);
+                tokens.Add(b);
+                return a.Evaluar() == b.Evaluar();
+        
             }
             catch (System.Exception)
             {
@@ -463,15 +519,23 @@ namespace AST
      //NODO DEL OPERADOR MENOR IGUAL 
      public class NodoMenorIgual :NodoOperacion ,Iboolean
     {
-        public static  tokenNumero izquierdo {get; private set;}
-        public static tokenNumero derecho {get ; private set;}
+       
 
-        public NodoMenorIgual(TokenTypes Types , string  value ,tokenNumero izquierdo ,tokenNumero derecho) :base (Types , value , izquierdo , derecho ){}
+        public NodoMenorIgual(TokenTypes Types , string  value ,List<tokenDefinition> izquierdo ,List<tokenDefinition> derecho) :base (Types , value , izquierdo , derecho )
+        {
+
+        }
         public bool Evaluar()
         {
             try
             {
-                return izquierdo.Evaluar () <= derecho.Evaluar(); 
+                tokenNumero a = new tokenNumero(TokenTypes.Number,metodos.evaluador(izquierdo ,0 ,0).ToString());
+                tokenNumero b = new tokenNumero (TokenTypes.Number ,metodos.evaluador(derecho ,0 ,0).ToString());
+                tokens.Add(a);
+                tokens.Add(b);
+                return a.Evaluar() <= b.Evaluar();
+                
+               
             }
             catch (System.Exception)
             {
@@ -484,15 +548,25 @@ namespace AST
     //NODO DEL OPERADOR MAYOR IGUAL 
      public class NodoMayorIgual :NodoOperacion  , Iboolean
     {
-        public static tokenNumero izquierdo {get; private set;}
-        public static  tokenNumero derecho {get ; private set;}
+        
+     
+        
 
-        public NodoMayorIgual(TokenTypes Types , string  value ,tokenNumero izquierdo ,tokenNumero derecho) :base (Types , value , izquierdo , derecho ){}
+        public NodoMayorIgual(TokenTypes Types , string  value ,List<tokenDefinition> izquierdo ,List<tokenDefinition> derecho) :base (Types , value , izquierdo , derecho )
+        {
+          
+        }
         public  bool Evaluar()
         {
             try
             {
-                return izquierdo.Evaluar () >= derecho.Evaluar();
+                tokenNumero a = new tokenNumero(TokenTypes.Number,metodos.evaluador(izquierdo ,0 ,0).ToString());
+                tokenNumero b = new tokenNumero (TokenTypes.Number ,metodos.evaluador(derecho ,0 ,0).ToString());
+                tokens.Add(a);
+                tokens.Add(b);
+                return a.Evaluar() >= b.Evaluar();
+                
+                ;
             }
             catch (System.Exception)
             {
@@ -505,15 +579,22 @@ namespace AST
      //NODO DEL OPERADOR DISTINTO 
      public class NodoDistinto :NodoOperacion ,Iboolean
     {
-        public static tokenNumero izquierdo {get; private set;}
-        public static tokenNumero derecho {get ; private set;}
+       
 
-        public NodoDistinto(TokenTypes Types , string  value ,tokenNumero izquierdo ,tokenNumero derecho) :base (Types , value ,izquierdo , derecho ){}
+        public NodoDistinto(TokenTypes Types , string  value ,List<tokenDefinition> izquierdo ,List<tokenDefinition> derecho) :base (Types , value ,izquierdo , derecho )
+        {
+          
+        }
         public bool Evaluar()
         {
             try
             {
-                return izquierdo.Evaluar () != derecho.Evaluar();
+                tokenNumero a = new tokenNumero(TokenTypes.Number,metodos.evaluador(izquierdo ,0 ,0).ToString());
+                tokenNumero b = new tokenNumero (TokenTypes.Number ,metodos.evaluador(derecho ,0 ,0).ToString());
+                tokens.Add(a);
+                tokens.Add(b);
+                return a.Evaluar() != b.Evaluar();
+             
             }
             catch (System.Exception)
             {
@@ -523,17 +604,16 @@ namespace AST
             
         }
     }
-    public class NodoOperacionL 
+    public class NodoOperacionL :tokenDefinition
     {
         public TokenTypes Type;
         public string Value ;
         public tokenLiteral izquierdo;
         public tokenLiteral derecho ;
 
-        public NodoOperacionL(TokenTypes Type  , string  Value ,tokenLiteral izquierodo , tokenLiteral derecho) 
+        public NodoOperacionL(TokenTypes Type  , string  Value ,tokenLiteral izquierodo , tokenLiteral derecho) :base(Type , Value) 
         {
-            this.Type = Type;
-            this.Value = Value ;
+         
             this.izquierdo = izquierdo;
             this.derecho = derecho ;
         }
@@ -546,7 +626,11 @@ namespace AST
         public tokenLiteral izquierdo;
         public tokenLiteral derecho ;
 
-        public NodoCompLit(TokenTypes Type  , string  Value ,tokenLiteral izquierodo , tokenLiteral derecho): base(Type , Value ,izquierodo , derecho){}
+        public NodoCompLit(TokenTypes Type  , string  Value ,tokenLiteral izquierodo , tokenLiteral derecho): base(Type , Value ,izquierodo , derecho)
+        {
+            tokens[0] = izquierdo;
+            tokens[1] = izquierdo;
+        }
 
         public bool Evaluar()
         {
@@ -569,7 +653,11 @@ namespace AST
         public tokenLiteral izquierdo;
         public tokenLiteral derecho ;
 
-        public NodoDistLit(TokenTypes Type  , string  Value ,tokenLiteral izquierodo , tokenLiteral derecho): base(Type , Value ,izquierodo , derecho){}
+        public NodoDistLit(TokenTypes Type  , string  Value ,tokenLiteral izquierodo , tokenLiteral derecho): base(Type , Value ,izquierodo , derecho)
+        {
+            tokens[0] = izquierdo;
+            tokens[1] = izquierdo;
+        }
 
         public bool Evaluar()
         {
@@ -586,33 +674,40 @@ namespace AST
         }
     }
     //le falta el metodo que me evalua 
-public class TernariaNum
+public class TernariaNum :tokenDefinition
 {
     public  NodoIgual condicion ;
     public  tokenDefinition valorVerdadero;
     public  tokenDefinition valorFalso;
+    public string Value2;
 
-    public TernariaNum(NodoIgual  condicion , tokenDefinition valorVerdadero , tokenDefinition valorFalso)
+    public TernariaNum(TokenTypes Types , string Value  , string Value2 ,NodoIgual  condicion , tokenDefinition valorVerdadero , tokenDefinition valorFalso): base(Types,Value)
     {
+            this.Value2 = Value2;
             this.condicion = condicion;
             this.valorVerdadero = valorVerdadero;
             this.valorFalso = valorFalso;
+             tokens[0] = valorVerdadero;
+            tokens[1] = valorFalso;
     }
    
 }
 //le falta el metodo que me evalua 
-    public class TernariaLiteral 
+    public class TernariaLiteral :tokenDefinition
     {
         public NodoCompLit condicion ;
         public tokenDefinition valorVerdadero;
-
         public tokenDefinition valorFalso;
-
-        public TernariaLiteral(NodoCompLit condicion,tokenDefinition valorVerdadero,tokenDefinition valorFalso)
+         public string Value2;
+         public TokenTypes Type ;
+        public TernariaLiteral(TokenTypes Types , string Value,string Value2 ,NodoCompLit condicion,tokenDefinition valorVerdadero,tokenDefinition valorFalso) :base(Types , Value)
         {
+            this.Value2 = Value2;
             this.condicion = condicion;
             this.valorVerdadero = valorVerdadero ;
             this.valorFalso = valorFalso ;
+            tokens[0] = valorVerdadero;
+            tokens[1] = valorFalso;
         }
         
     }

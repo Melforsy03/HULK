@@ -14,12 +14,12 @@ namespace tokenizar
     public class Tokenizer 
     {
         private static List<tokenDefinition> TokenDefi = new List<tokenDefinition>(){
-            new tokenDefinition(TokenTypes.Keyword ,"if"),
+            new TernariaNum(TokenTypes.Keyword ,"if" ,"else" ,null , null , null),
             new tokenDefinition(TokenTypes.Keyword ,"let") ,
             new tokenDefinition(TokenTypes.Keyword ,"print"),
             new tokenDefinition(TokenTypes.Keyword ,"in"),
             new tokenDefinition(TokenTypes.Keyword ,"function"),
-            new tokenDefinition(TokenTypes.Keyword , "else"),
+            new TernariaLiteral(TokenTypes.Keyword , "if","else" ,null , null ,null),
             new tokenDefinition(TokenTypes.Keyword , "for"),
             new tokenDefinition(TokenTypes.Keyword , "while"),
             new tokenDefinition(TokenTypes.Keyword, "int"),
