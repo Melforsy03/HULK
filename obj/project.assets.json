@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\fosythe´s family\\Desktop\\compilador\\compilador.csproj",
+      "projectUniqueName": "C:\\Users\\fosythe´s family\\Desktop\\Mel\\compilador\\HULK\\compilador.csproj",
       "projectName": "compilador",
-      "projectPath": "C:\\Users\\fosythe´s family\\Desktop\\compilador\\compilador.csproj",
+      "projectPath": "C:\\Users\\fosythe´s family\\Desktop\\Mel\\compilador\\HULK\\compilador.csproj",
       "packagesPath": "C:\\Users\\fosythe´s family\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\fosythe´s family\\Desktop\\compilador\\obj\\",
+      "outputPath": "C:\\Users\\fosythe´s family\\Desktop\\Mel\\compilador\\HULK\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\fosythe´s family\\AppData\\Roaming\\NuGet\\NuGet.Config"
