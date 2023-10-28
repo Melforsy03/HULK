@@ -1,4 +1,5 @@
 ﻿using AST;
+using Usuario;
 namespace Tokenizador
 {
 public class tokenizador
@@ -115,37 +116,43 @@ public  static List<token> Identificador(List<token> expression)
                 if (tokens.Count >= 1)
                 {
                     
-            if (tokens[tokens.Count - 1].Value == "let" || tokens[tokens.Count - 1].Value == "function" || tokens[tokens.Count - 1].Value == "*" || tokens[tokens.Count - 1].Value == "-" ||tokens[tokens.Count - 1].Value == "+" || tokens[tokens.Count - 1].Value == "/"|| tokens[tokens.Count - 1].Value == "%" || tokens[tokens.Count - 1].Value == "(")
+            if (tokens[tokens.Count - 1].Value == "let" || tokens[tokens.Count - 1].Value == "function" || tokens[tokens.Count - 1].Value == "*" || tokens[tokens.Count - 1].Value == "-" ||tokens[tokens.Count - 1].Value == "+" || tokens[tokens.Count - 1].Value == "/"|| tokens[tokens.Count - 1].Value == "%" || tokens[tokens.Count - 1].Value == "(" || tokens[tokens.Count - 1].Value == "in")
             {
                 for (int j = i+1; j < input.Length; j++)
                 {
-                    if (input[j] != ' ' && input[j] != ')')
+                    if (input[j] != ' ' && input[j] != ')' && input[j] != '(')
                     {
                     
                         currentToken += input[j];
                         
                    }
-                    if (input[j] == ' ' || input[j] == ')' )
+                    if (input[j] == ' ' || input[j] == ')' || input[j] == '(' )
                     {
-                     if (tokens[tokens.Count-1].Value == "function")
+                     if (tokens[tokens.Count-1].Value == "function"  )
                    {
             
                     tokens.Add(new Function (currentToken , TokenTypes.funcion));
                      i = j;
-                        break;
+                    break;
+                  }
+                  else if ( tokens[tokens.Count-1 ].Value == "in" || encuentro(currentToken , Usuario.A.root.fuc) != -1)
+                  {
+                     tokens.Add(new Function (currentToken , TokenTypes.funcion));
+                     i = j;
+                    break;
                   }
                   else
                   {
-                    
+    
                         tokens.Add(new  identificador(currentToken , TokenTypes.Identifier));
                         i = j;
                         break;
                   }
                     }
                 }
-                     if(input[i] == ')' ||IsOperator(input[i]) || input[i] == ';')
+                     if(input[i] == ')' ||IsOperator(input[i]) || input[i] == ';' || input[i] == '(')
                     {
-                        if (input[i] == ')' || input[i] == ';')
+                        if (input[i] == ')' || input[i] == ';' ||input[i] == '(')
                         {
                             tokens.Add(new token(input[i].ToString() , TokenTypes.Punctuation));
                         }
@@ -183,21 +190,30 @@ public  static List<token> Identificador(List<token> expression)
                     currentToken  = "";
                     continue;
             }
-            else if (encuentro(currentToken , tokens) != -1)
+            else if (i >= 1)
             {
-                tokens.Add(tokens[encuentro(currentToken ,tokens)]);
+           
+             if (encuentro(currentToken , tokens) != - 1)
+            {
+                tokens.Add(new token(currentToken , TokenTypes.Identifier));
                 currentToken = "";
                 continue;
+
             }
-        }
+           
+          }
     
         }
-        }
+        
            // tokens.Add(new token(currentToken, TokenTypes.Identifier));
-        }
+        
          }
         }
-        return tokens;
+             }
+             }
+        }
+          return tokens;
+             
     }
 
    public static bool IsOperator(char c)
@@ -233,6 +249,7 @@ public  static List<token> Identificador(List<token> expression)
   
     }
 }
+
 
 
 

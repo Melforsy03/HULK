@@ -6,6 +6,7 @@ namespace Usuario
 {
      public class A 
     {
+       public static  Parser root = new Parser();
        public static void Main (string [] args)
         {
             string a = "function sum (a) => if(a > 0) sum (a - 1) + a else {0}";
@@ -14,12 +15,20 @@ namespace Usuario
             List<token> papa = tokenizador.TokenizeString(b);
             Parser root = new Parser();
             Parser beta = new Parser();
-            beta.Root = root;
-            beta.expression = alfa ;
             Parser ganma = new Parser();
+            beta.Root = root;
+            ganma.Root  = root;
+            beta.expression = alfa;
             ganma.expression = papa;
-            Console.WriteLine(beta.EvaluateO());
-           
+            beta.construir();
+            ganma.construir();
+            root.agregar(beta);
+            root.fuc = root.variables;
+            root.agregar(ganma);
+            
+            List<string> m = new List<string>();
+            root.EvaluateO();
+         
         }
     }
 }

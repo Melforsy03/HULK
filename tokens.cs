@@ -1,4 +1,4 @@
-
+using Abol;
 namespace AST
 {
     //tipos de token 
@@ -28,7 +28,7 @@ public class token : metodo
  {
     if (Type == TokenTypes.Number)
     {
-        return Value;;
+        return Value;
     }
     if (tokens[0].Type == TokenTypes.Number)
     {
@@ -38,10 +38,14 @@ public class token : metodo
     {
          return ((OperatorNode)tokens[0]).Evaluar().ToString() ;
     }
-   else if (tokens[0].Type == TokenTypes.funcion)
+   else if (tokens[0].Type == TokenTypes.funcion && tokens[0] is Function)
+    {
+        return ((Function)tokens[0]).Evaluar().ToString();
+
+    }
+    else if (tokens[0].Type == TokenTypes.funcion && tokens[0] is FunctionNode)
     {
         return ((FunctionNode)tokens[0]).Evaluar().ToString();
-
     }
     else if (tokens[0].Type == TokenTypes.Condicional)
     {
@@ -208,6 +212,10 @@ public class OperatorNode : token
             {
                 return ((FunctionNode)tokens[0]).Evaluar() - ((FunctionNode)tokens[1]).Evaluar();
             }
+             else 
+            {
+                return double.Parse(tokens[0].Evaluar()) - double.Parse(tokens[1].Evaluar()) ;           
+            }
        }
        else if (Value == "*")
        {
@@ -239,6 +247,10 @@ public class OperatorNode : token
             else if(tokens[0].Type == TokenTypes.funcion && tokens[1].Type == TokenTypes.funcion)
             {
                 return ((FunctionNode)tokens[0]).Evaluar() * ((FunctionNode)tokens[1]).Evaluar();
+            }
+             else 
+            {
+                return double.Parse(tokens[0].Evaluar()) - double.Parse(tokens[1].Evaluar()) ;           
             }
        }
        else if (Value == "/")
@@ -272,6 +284,10 @@ public class OperatorNode : token
             {
                 return ((FunctionNode)tokens[0]).Evaluar() / ((FunctionNode)tokens[1]).Evaluar();
             }
+             else 
+            {
+                return double.Parse(tokens[0].Evaluar()) / double.Parse(tokens[1].Evaluar()) ;           
+            }
        }
        else if (Value == "^")
        {
@@ -304,13 +320,17 @@ public class OperatorNode : token
             {
                 return Math.Pow(((FunctionNode)tokens[0]).Evaluar() , ((FunctionNode)tokens[1]).Evaluar());
             }
+             else 
+            {
+                return Math.Pow(double.Parse(tokens[0].Evaluar()) , double.Parse(tokens[1].Evaluar())) ;           
+            }
        }
        else if (Value == "%")
        {
         
             if (tokens[0].Type == TokenTypes.Number && tokens[1].Type == TokenTypes.Number )
             {
-                                  return ((tokenNumero)tokens[0]).Evaluar() % ((tokenNumero)tokens[1]).Evaluar();
+             return ((tokenNumero)tokens[0]).Evaluar() % ((tokenNumero)tokens[1]).Evaluar();
             }
             else  if (tokens[0].Type == TokenTypes.Operator && tokens[1].Type == TokenTypes.Number)
             {
@@ -335,6 +355,10 @@ public class OperatorNode : token
             else if(tokens[0].Type == TokenTypes.funcion && tokens[1].Type == TokenTypes.funcion)
             {
                 return ((FunctionNode)tokens[0]).Evaluar() % ((FunctionNode)tokens[1]).Evaluar();
+            }
+             else 
+            {
+                return double.Parse(tokens[0].Evaluar()) % double.Parse(tokens[1].Evaluar()) ;           
             }
        }
                 throw new InvalidOperationException("Operador no válido");
@@ -403,6 +427,10 @@ public class  tokenBul : token
        {
         resultado = ((FunctionNode)tokens[0]).Evaluar() != ((tokenNumero)tokens[1]).Evaluar();
        }
+       else 
+       {
+        resultado = double. Parse (tokens[0].Evaluar()) != double.Parse(tokens[1].Evaluar());
+       }
     }
     else if (Value == ">")
     {
@@ -446,6 +474,11 @@ public class  tokenBul : token
        {
         resultado = ((FunctionNode)tokens[0]).Evaluar() > ((tokenNumero)tokens[1]).Evaluar();
        }
+       else 
+       {
+        resultado = double. Parse (tokens[0].Evaluar()) > double.Parse(tokens[1].Evaluar());
+       }
+       
     }
 
     else if (Value == "<" )
@@ -489,6 +522,10 @@ public class  tokenBul : token
         if (tokens[0].Type == TokenTypes.funcion && tokens[1].Type == TokenTypes.Number)
        {
         resultado = ((FunctionNode)tokens[0]).Evaluar() < ((tokenNumero)tokens[1]).Evaluar();
+       }
+       else 
+       {
+        resultado = double. Parse (tokens[0].Evaluar()) < double.Parse(tokens[1].Evaluar());
        }
     }
     else if (Value == "==" )
@@ -534,6 +571,10 @@ public class  tokenBul : token
        {
         resultado = ((FunctionNode)tokens[0]).Evaluar() == ((tokenNumero)tokens[1]).Evaluar();
        }
+       else 
+       {
+        resultado = double. Parse (tokens[0].Evaluar()) == double.Parse(tokens[1].Evaluar());
+       }
     }
     else if (Value == ">=" )
     {
@@ -577,6 +618,10 @@ public class  tokenBul : token
        {
         resultado = ((FunctionNode)tokens[0]).Evaluar() >= ((tokenNumero)tokens[1]).Evaluar();
        }
+       else 
+       {
+        resultado = double. Parse (tokens[0].Evaluar()) >= double.Parse(tokens[1].Evaluar());
+       }
     }
     else if (Value == "<=" )
     {
@@ -619,16 +664,16 @@ public class  tokenBul : token
        {
         resultado = ((FunctionNode)tokens[0]).Evaluar() <= ((tokenNumero)tokens[1]).Evaluar();
        }
+       else 
+       {
+        resultado = double. Parse (tokens[0].Evaluar()) <= double.Parse(tokens[1].Evaluar());
+       }
     }
     return resultado;
 }
     
 }
 //esta clase es para parsear expresiones aritmeticas dado una lista de tokens 
-
-
-
-//parsea el arbol 
 public class FunctionNode : token
 {
     public string FunctionName { get; set; }
@@ -691,28 +736,88 @@ public class Function :token
 {
     
     public Function(String Value , TokenTypes Type) : base(Value , Type){}
-
     public token parametro {get ; set ;}
-
-    public void CambioV()
+   
+    public void CambioV(List<token> c)
     {
-        if (tokens.Count == 0)
+        if (c.Count == 0 || c == null)
         {
             return;
         }
-        for (int i = 1; i < tokens.Count; i++)
+        for (int i = 0; i < c.Count; i++)
         {
-            if (tokens[i].Value == tokens[0].Value)
+            if ( c[i]!= null && c[i].Value == tokens[0].Value)
             {
-                tokens[i] = parametro;
+                c[i] = parametro;
             }
+            if (Parser.FindFun(c[i], Parser.fuc2) != -1 && c[i].Type is TokenTypes.funcion)
+            {
+                Function a = (Function)Parser.fuc2[Parser.FindFun(c[i] ,Parser.fuc2)];
+                string valor = a.parametro.Evaluar();
+                if (double.TryParse(valor ,out double value ))
+                {
+                    a.parametro = new tokenNumero(valor ,TokenTypes.Number);
+                }
+                else
+                {
+                    a.parametro = new tokenLiteral(valor , TokenTypes.Literal);
+                }
+                c[i] = (Function)Parser.variables2[Parser.FindFun(c[i] ,Parser.variables2)];
+                 
+            }
+            if (c[i] != null)
+            {
+                 CambioV(c[i].tokens);
+            }
+              
+            
         }
     }
     public string Evaluar()
     {
-        CambioV();
-        return tokens[1].Evaluar();
+        CambioV(tokens);
+        string b = "";
+         if (tokens[1].Value == "+")
+        {
+            return ((OperatorNode)tokens[1]).Evaluar().ToString();
+        }
+        else if(tokens[1].Value== "-")
+        {
+           return ((OperatorNode)tokens[1]).Evaluar().ToString();
+        }
+        else if (tokens[1].Value == "Print")
+        {
+            return tokens[1].Evaluar();
+        }
+        else if (tokens[1].Value == "if")
+        {
+            return  ((IfElseNode)tokens[1]).Evaluar().ToString();
+        }
+        else if(Parser.Isfunction(tokens[1].Value))
+        {
+            return ((FunctionNode)tokens[1]).Evaluar().ToString();
+        }
+        else if(tokens[1].Type == TokenTypes.funcion && FindFun(tokens[1], Parser.variables2) != 1)
+        {
+            Function a = (Function)Parser.variables2[FindFun(tokens[1] ,Parser.variables2)] ;
+            a.parametro = tokens[1].tokens[0];
+            return a.Evaluar();
+        }
+       return b;
+}
+public static int FindFun(token a , List<token> variables )
+{
+    for (int i = 0; i < variables.Count; i++)
+    {
+        if (a.Value == variables[i].Value)
+        {
+            return i;
+        }
     }
+    Console.WriteLine("funcion no definida");
+    return -1;
+}
+
 }
 }
 

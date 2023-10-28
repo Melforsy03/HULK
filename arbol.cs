@@ -10,9 +10,10 @@ public  class Parser :token
     public  List<token> expression {get; set;}
     public  List<token> variables {get ; set;}
     public List<token> parameters{get ; set;}
-    
     public  List<token> fuc{get ; set;}
-    
+    public static List<token> fuc2 {get ; set ;}
+    public static List<token> variables2 {get ; set;}
+
     public Parser() :base(value , Type)
     {
         //this.Root = new token(null ,TokenTypes.Literal);
@@ -21,60 +22,77 @@ public  class Parser :token
         variables = new List<token>();
         parameters = new List<token>();
         fuc = new List<token>();
-        
+        fuc2 = new List<token>();
+        variables2 = new List<token>();
     }
- 
+
 //parsea el arbol 
-public string EvaluateO()
+public void construir()
 {
-    
      Parse();
-     return Evaluate(tokens);
+    
 }
-public string Evaluate (List<token> b )
+public void EvaluateO()
+{
+
+    //List<String> A = new List<string>();
+      Evaluate(tokens );
+}
+public void Evaluate (List<token> b )
 {
     string evaluar = "";
     foreach (var item in b)
     {
-     
+     if(item == null)
+     {
+        continue;
+     }
          if (item.Value == "+")
         {
-            return ((OperatorNode)item).Evaluar().ToString();
+            evaluar = ((OperatorNode)item).Evaluar().ToString();
+            Console.WriteLine(evaluar);
         }
         else if(item.Value== "-")
         {
-            return ((OperatorNode)item).Evaluar().ToString();
+            evaluar = ((OperatorNode)item).Evaluar().ToString();
+            Console.WriteLine(evaluar);
         
         }
         else if (item.Value == "Print")
         {
-            return item.Evaluar();
+            evaluar = item.Evaluar();
         }
         else if (item.Value == "if")
         {
-            return  ((IfElseNode)item).Evaluar().ToString();
+            evaluar = ((IfElseNode)item).Evaluar().ToString();
+            Console.WriteLine(evaluar);
         }
         else if(Isfunction(item.Value))
         {
-            return ((FunctionNode)item).Evaluar().ToString();
+                evaluar = ((FunctionNode)item).Evaluar().ToString();
+                Console.WriteLine(evaluar); 
         }
-        else if(item.Type == TokenTypes.funcion && FindFun(item) != -1 )
+        else if(item.Type == TokenTypes.funcion && FindFun(item , variables) != -1 )
         {
-            int k = FindFun(item);
-            Function funcion = (Function)Root.tokens[k];
+            int k = FindFun(item , variables);
+            Function funcion = (Function)variables[k];
             funcion.parametro = item.tokens[0];
-            return ((Function)funcion).Evaluar().ToString();
+            evaluar = ((Function)funcion).Evaluar().ToString();
+            Console.WriteLine(evaluar);
+        }
+        else if(item.tokens != null)
+        {
+              Evaluate(item.tokens );
         }
        
-    } 
-   
-    return evaluar;
+    }      
 }
     public void  Parse()
     
     {
        expresiones();
-    
+      fuc2 = fuc ;
+     variables2 = variables;
     }
     public void expresiones ()
     {
@@ -110,15 +128,27 @@ public string Evaluate (List<token> b )
 //parsea las expresiones 
     private token ParseExpression()
     {
+       
         token leftNode = ParseTerm();
         if (position == expression.Count)
         {
            return leftNode ;
         }
+        
         while (position < expression.Count)
         {
             string c = expression[position].Value;
+          
+          if (leftNode != null && leftNode is Function && c == ")" )
+          {
+            if (position + 1 < expression.Count)
+            {
+                 position++;
+             c = expression[position].Value ;
+            }
+           
             
+          }
             //si encuentra una funcion
              if(Isfunction(c))
             {
@@ -134,18 +164,18 @@ public string Evaluate (List<token> b )
             else if (c == "Print")
             {
                 position++;
-                leftNode = parserPrint(expression[position - 1]);
+                return parserPrint(expression[position - 1]);
             }
       
             else if (c == "if")
             {
                 position++;
-                leftNode = parserIFelse();
+                return parserIFelse();
             }
             else if (c == "else")
             {
                 position++;
-                leftNode = ParseFunction(expression[position - 1]);
+                return ParseFunction(expression[position - 1]);
             }
           
             //si encuentra un operador de estos
@@ -155,12 +185,12 @@ public string Evaluate (List<token> b )
                  operatorNode.tokens.Add(leftNode);
                  position++;
                  operatorNode.tokens.Add(ParseTerm());
-                 leftNode = operatorNode;
+                 return operatorNode;
                 
             }   
             else if (c == "(")
             {
-                leftNode = ParseTerm();
+                return ParseTerm();
             }
           
             //si encuentra un operador de estos 
@@ -172,7 +202,7 @@ public string Evaluate (List<token> b )
                 tokenBul condicion = new tokenBul(c,TokenTypes.Condicional);
                  condicion.tokens.Add(leftNode);
                  condicion.tokens.Add(rigthNode);
-                leftNode = condicion;
+                return condicion;
             }
             //si encuentra un operador de estos 
             else if(c == "&&" || c == "||" )
@@ -182,7 +212,7 @@ public string Evaluate (List<token> b )
                 token rigthNode = ParseTerm();
                 condicion.tokens.Add((tokenBul)leftNode);
                 condicion.tokens.Add((tokenBul)rigthNode);
-                leftNode = condicion;
+                return condicion;
 
             }
             else
@@ -239,25 +269,20 @@ public string Evaluate (List<token> b )
            node = k;
            position++;
         }
-        else if(expression[position].Type == TokenTypes.Identifier && expression[position - 2].Type == TokenTypes.funcion)
+        else if(position >= 2 && expression[position].Type == TokenTypes.Identifier && expression[position - 2].Type == TokenTypes.funcion)
         {
             node = expression[position];
             parameters.Add(node);
             position++;
         }
+      
         else if(encuentro(expression[position].Value , parameters) != - 1)
         {
             node = parameters[encuentro(expression[position].Value , parameters)];
             position++;
 
         }
-        else if(encuentro(expression[position].Value , fuc) != -1)
-        {
-            node = new Function(expression[position].Value , TokenTypes.funcion );
-            position++;
-            node.tokens.Add(ParseExpression());
         
-        }
         else
         {
         string c = expression[position].Value;
@@ -267,19 +292,35 @@ public string Evaluate (List<token> b )
             position++;
             node = ParseExpression();
         }
-        else if (expression[position].Type == TokenTypes.Identifier)
+        else if (expression[position].Type == TokenTypes.Identifier && expression[position -1 ].Value == "let")
         {
             identificador iden = (identificador)expression[position];
             position++;
             iden.tokens.Add(ParseExpression());
             variables.Add(iden);
             node = ParseExpression();
-        } 
-        else if (expression[position].Type == TokenTypes.funcion)
+        }
+        else if( encuentro(expression[position].Value , Root.variables) != -1 || encuentro(expression[position].Value , fuc) != -1 )
+        {
+            node = new Function(expression[position].Value , TokenTypes.funcion );
+            position++;
+            node.tokens.Add(ParseExpression());
+            
+        }
+        else if(expression[position].Type == TokenTypes.Identifier) 
+        {
+            node = expression[position];
+            position++;
+        }
+        else if (expression[position].Type == TokenTypes.funcion && expression[position - 1].Value == "function")
         {
             ParseFUC(expression[position]);
             position++;
-            node = ParseExpression();
+            if (position < expression.Count)
+            {
+                 node = ParseExpression();
+            }
+            
         }
         else if (double.TryParse(c,out double value))
         {
@@ -346,6 +387,8 @@ public string Evaluate (List<token> b )
             position++;
             node = ParseFunction(expression[position - 1]);
         }
+        
+       
      }
      return node ;
   }
@@ -364,6 +407,7 @@ public string Evaluate (List<token> b )
             parent.tokens.Add(a);
             return parent;
     }
+
     public token parserIFelse()
 
     {
@@ -373,7 +417,10 @@ public string Evaluate (List<token> b )
         position++;
         token b = ParseExpression();
         ifi.tokens.Add(b);
+       if(expression[position].Value == "(")
+       {
         position++;
+       }
         token c = ParseExpression();
         ifi.tokens.Add(c);
         return ifi;
@@ -386,10 +433,15 @@ public void ParseFUC(token b)
             position++;
             token a = ParseExpression();
             iden.tokens.Add(a);
-            position++;
+             if(expression[position].Value == ")")
+            {
+             position++;
+            }
             a = ParseExpression();
             iden.tokens.Add(a);
-            Root.variables.Add(iden);}
+            Root.variables.Add(iden);
+            
+            }
     public  token FinIndeX (token a)
     {
         for (int i = 0 ; i < variables.Count; i++)
@@ -407,11 +459,11 @@ public void ParseFUC(token b)
         return c == "sin" || c == "cos" || c == "tan" || c == "sqrt"  || c == "^";
   }
 
-public  int FindFun(token a )
+public static int FindFun(token a , List<token> variables )
 {
-    for (int i = 0; i < Root.tokens.Count; i++)
+    for (int i = 0; i < variables.Count; i++)
     {
-        if (a.Value == Root.tokens[i].Value)
+        if (a.Value == variables[i].Value)
         {
             return i;
         }
@@ -419,7 +471,7 @@ public  int FindFun(token a )
     Console.WriteLine("funcion no definida");
     return -1;
 }
- public static int encuentro(string a ,List<token> b)
+ public static  int encuentro(string a , List<token> b)
   {
     for (int i = 0; i < b.Count; i++)
     {
@@ -430,6 +482,11 @@ public  int FindFun(token a )
     }
     return -1;
 
+}
+
+public void agregar (Parser a )
+{
+    tokens.Add(a);
 }
 }
 }

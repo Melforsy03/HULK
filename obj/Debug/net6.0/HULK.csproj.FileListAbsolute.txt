@@ -1,0 +1,15 @@
+C:\Users\fosythe´s family\Desktop\Mel\compilador\HULK\bin\Debug\net6.0\HULK.exe
+C:\Users\fosythe´s family\Desktop\Mel\compilador\HULK\bin\Debug\net6.0\HULK.deps.json
+C:\Users\fosythe´s family\Desktop\Mel\compilador\HULK\bin\Debug\net6.0\HULK.runtimeconfig.json
+C:\Users\fosythe´s family\Desktop\Mel\compilador\HULK\bin\Debug\net6.0\HULK.dll
+C:\Users\fosythe´s family\Desktop\Mel\compilador\HULK\bin\Debug\net6.0\ref\HULK.dll
+C:\Users\fosythe´s family\Desktop\Mel\compilador\HULK\bin\Debug\net6.0\HULK.pdb
+C:\Users\fosythe´s family\Desktop\Mel\compilador\HULK\obj\Debug\net6.0\HULK.csproj.AssemblyReference.cache
+C:\Users\fosythe´s family\Desktop\Mel\compilador\HULK\obj\Debug\net6.0\HULK.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\fosythe´s family\Desktop\Mel\compilador\HULK\obj\Debug\net6.0\HULK.AssemblyInfoInputs.cache
+C:\Users\fosythe´s family\Desktop\Mel\compilador\HULK\obj\Debug\net6.0\HULK.AssemblyInfo.cs
+C:\Users\fosythe´s family\Desktop\Mel\compilador\HULK\obj\Debug\net6.0\HULK.csproj.CoreCompileInputs.cache
+C:\Users\fosythe´s family\Desktop\Mel\compilador\HULK\obj\Debug\net6.0\HULK.dll
+C:\Users\fosythe´s family\Desktop\Mel\compilador\HULK\obj\Debug\net6.0\ref\HULK.dll
+C:\Users\fosythe´s family\Desktop\Mel\compilador\HULK\obj\Debug\net6.0\HULK.pdb
+C:\Users\fosythe´s family\Desktop\Mel\compilador\HULK\obj\Debug\net6.0\HULK.genruntimeconfig.cache
