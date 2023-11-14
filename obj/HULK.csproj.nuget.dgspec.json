@@ -1,15 +1,15 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\fosythe´s family\\Desktop\\Mel\\compilador\\HULK\\HULK.csproj": {}
+    "C:\\Users\\fosythe´s family\\Desktop\\Mel\\compilador\\HULK\\Hulk.csproj": {}
   },
   "projects": {
-    "C:\\Users\\fosythe´s family\\Desktop\\Mel\\compilador\\HULK\\HULK.csproj": {
+    "C:\\Users\\fosythe´s family\\Desktop\\Mel\\compilador\\HULK\\Hulk.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\fosythe´s family\\Desktop\\Mel\\compilador\\HULK\\HULK.csproj",
-        "projectName": "HULK",
-        "projectPath": "C:\\Users\\fosythe´s family\\Desktop\\Mel\\compilador\\HULK\\HULK.csproj",
+        "projectUniqueName": "C:\\Users\\fosythe´s family\\Desktop\\Mel\\compilador\\HULK\\Hulk.csproj",
+        "projectName": "Hulk",
+        "projectPath": "C:\\Users\\fosythe´s family\\Desktop\\Mel\\compilador\\HULK\\Hulk.csproj",
         "packagesPath": "C:\\Users\\fosythe´s family\\.nuget\\packages\\",
         "outputPath": "C:\\Users\\fosythe´s family\\Desktop\\Mel\\compilador\\HULK\\obj\\",
         "projectStyle": "PackageReference",

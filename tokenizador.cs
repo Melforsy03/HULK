@@ -1,5 +1,5 @@
 ﻿using AST;
-using usuario;
+using Usuario;
 using System.Text.RegularExpressions;
 namespace Tokenizador
 {
@@ -39,16 +39,30 @@ public static List<string> Corregir(List<token> expression)
         if (expression[expression.Count - 1].Value !=";")
         {
              errores.Add("error sintactico , esperabamos un ;");
+             continue;
+        }
+        if (expression[i].Value == "in" )
+        {
+            if (expression[i + 1].Value == ";")
+            {
+                errores.Add("error sintactico ,en el let - in ");
+            }
+            if (expression[i+ 1].Type != TokenTypes.funcion && expression [i + 1].Type != TokenTypes.Keyword && expression [i + 1].Type != TokenTypes.Identifier)
+            {
+                errores.Add("error semantico , en el in - let ");
+            }
         }
         if (i >= 1)
         { 
         if (expression[i].Value == "=" && expression[i-1].Type != TokenTypes.Identifier )
         {
         errores.Add(" error lexico , en el in - let");
+        continue ;
         }
         if(expression[i].Value == "=" &&  expression[i+1].Value == "in")
         {
             errores.Add("error sintactico en el in - let");
+            continue ;
         }
         if (expression[i].Value == "=")
         {
@@ -56,13 +70,15 @@ public static List<string> Corregir(List<token> expression)
             {
                 if (expression[i + 1].Value == "\"")
                 {
-                    if (expression[i+ 2].Type != TokenTypes.Literal)
+                    if (expression[i + 2].Type != TokenTypes.Literal)
                     {
                          errores.Add("error de sintaxis , se esperaba un string");
+                         continue;
                     }
                     if (expression[i + 3].Value != "\"")
                     {
-                       errores.Add("error de sintaxis , se esperaba un \""); 
+                       errores.Add("error de sintaxis , se esperaba un \"");
+                       continue; 
                     }
                 }
               
@@ -74,10 +90,12 @@ public static List<string> Corregir(List<token> expression)
           if (Double.TryParse(expression[i].Value ,out  double result))
           {
             errores.Add(" error lexico , la variable " + expression[i].Value + " no es un nombre valido");
+            continue;
           }
           else if (Regex.IsMatch (expression[i].Value , @"\d"))
           {
             errores.Add(" error lexico ,la variable "  + expression[i].Value + " no es un nombre valido");
+            continue;
           }
         }
         if (expression[i].Value == ")" )
@@ -87,12 +105,14 @@ public static List<string> Corregir(List<token> expression)
             {
                 errores.Add("error lexico , se esperaba un )");
                 parentisis++;
+                continue;
             }
            
        }
        if (expression[i].Value == "(")
        {
          parentisis++;
+         continue;
        }
  }
  if (parentisis != 0)
@@ -105,6 +125,7 @@ public static List<string> Corregir(List<token> expression)
  public  static List<token> TokenizeString(string input)
     {
         int cont = 0;
+        bool c = false ;
         List<token> tokens = new List<token>();
         string currentToken = "";
 
@@ -201,39 +222,50 @@ public static List<string> Corregir(List<token> expression)
              else
              {  
                 //si es un identicador 
-                if (tokens.Count >= 1)
-                {
-                    
+            if (tokens.Count >= 1)
+        {      
             if (tokens[tokens.Count - 1].Value == "let" || tokens[tokens.Count - 1].Value == "function" || tokens[tokens.Count - 1].Value == "*" || tokens[tokens.Count - 1].Value == "-" ||tokens[tokens.Count - 1].Value == "+" || tokens[tokens.Count - 1].Value == "/"|| tokens[tokens.Count - 1].Value == "%" || tokens[tokens.Count - 1].Value == "(" || tokens[tokens.Count - 1].Value == "in" || tokens[tokens.Count - 1].Value == ",")
             {
-                bool c = false;
+              
                 for (int j = i+1; j < input.Length; j++)
                 {
-                    if (input[j] != ' ' && input[j] != ')' && input[j] != '(' && !IsOperator(input[j].ToString()) && !Isfunction(input[j].ToString()) && input[j] !=',')
+                    if (input[j] != ' ' && input[j] != ')' && input[j] != '(' && !IsOperator(input[j].ToString()) && !Isfunction(input[j].ToString()) && input[j] !=',' && input[j] != ';')
                     {
                         currentToken += input[j];
                     }
-                    if (input[j] == ' ' || input[j] == ')' || input[j] == '(' || IsOperator(input[j].ToString()) || Isfunction(input[j].ToString()) || input[j] == ',' )
+                    if (input[j] == ' ' || input[j] == ')' || input[j] == '(' || IsOperator(input[j].ToString()) || Isfunction(input[j].ToString()) || input[j] == ',' || input[j] == ';')
                     {
                      if (tokens[tokens.Count - 1].Value == "function")
                    {
                     tokens.Add(new Function (currentToken , TokenTypes.funcion));
                      i = j;
                      c = true;
+                     if (input[j] == ';')
+                    {
+                         tokens.Add(new token(currentToken ,TokenTypes.Punctuation ));
+                    }
                     break;
                   }
-                  else if ( tokens[tokens.Count-1 ].Value == "in" && encuentro(currentToken , usuario.A.root.fuc) != -1)
+                  else if ( tokens[tokens.Count-1 ].Value == "in" && encuentro(currentToken , Usuario.A.root.fuc) != -1)
                   {
                      tokens.Add(new Function (currentToken , TokenTypes.funcion));
                      i = j;
                      c = true ;
+                     if (input[j] == ';')
+                    {
+                         tokens.Add(new token(currentToken ,TokenTypes.Punctuation ));
+                    }
                     break;
                   }
                   else if ( tokens[tokens.Count - 1 ].Value == "in" && IsKeyWords(currentToken))
                   {
-                  c =true ;
+                    c =true;
                     tokens.Add(new token(currentToken ,TokenTypes.Keyword) );
                     i = j ;
+                    if (input[j] == ';')
+                    {
+                         tokens.Add(new token(currentToken ,TokenTypes.Punctuation ));
+                    }
                     break;
                   }
                   else
@@ -246,7 +278,48 @@ public static List<string> Corregir(List<token> expression)
                   }
                 }
                 }
-                if (c == true )continue;
+            }
+                if (c == true )
+                {
+                    c = false ;
+                    continue;
+                }
+                if (input[i] == ',' )
+                {
+                    tokens.Add(new token(input[i].ToString(), TokenTypes.Punctuation));
+                    continue;
+                }
+            if(tokens.Count > 0 )
+            {
+            if(cont > 0 && tokens[tokens.Count - 1].Value == "\"" )
+            {
+              // currentToken = "";
+                for (int j = i + 1; j < input.Length;j++)
+                {
+                 if ( input[j] != '\"') currentToken += input[j];
+                    if (input[j] == '\"' )
+                    {
+                        cont--;
+                        i = j ;
+                        tokens.Add(new token(currentToken ,TokenTypes.Literal));
+                        tokens.Add(new token (input[j].ToString() , TokenTypes.Punctuation));
+                        currentToken = "";
+                        break;
+                    }
+                }
+                    continue;
+            }
+            else if (i >= 1)
+            {
+             if (encuentro(currentToken , tokens) != - 1)
+            {
+                tokens.Add(new token(currentToken , TokenTypes.Identifier));
+                currentToken = "";
+                continue;
+            }
+           
+          }
+        }
                 if (i < input.Length)
                 {
                  if(input[i] == ')' ||IsOperator(input[i].ToString()) || input[i] == ';' || input[i] == '(' || input[i] == ',')
@@ -270,41 +343,8 @@ public static List<string> Corregir(List<token> expression)
                 }
                     
             } 
-            if(tokens.Count > 0 )
-            {
-            if(cont > 0 && tokens[tokens.Count - 1].Value == "\"" || tokens[tokens.Count - 1].Value == "'")
-            {
-                currentToken = "";
-                for (int j = i +1; j < input.Length;j++)
-                {
-                 if ( input[j] != '\"') currentToken += input[j];
-                    if (input[j] == '\"' )
-                    {
-                        cont--;
-                        i = j ;
-                        tokens.Add(new token(currentToken ,TokenTypes.Literal));
-                        tokens.Add(new token (input[j].ToString() , TokenTypes.Punctuation));
-                        currentToken = "";
-                        break;
-                    }
-                }
-                    continue;
-            }
-            else if (i >= 1)
-            {
-             if (encuentro(currentToken , tokens) != - 1)
-            {
-                tokens.Add(new token(currentToken , TokenTypes.Identifier));
-                currentToken = "";
-                continue;
-
-            }
            
-          }
-    
-        }
-        
-         }
+         
         }
              }
              }

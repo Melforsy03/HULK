@@ -6,15 +6,15 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v6.0": {
-      "HULK/1.0.0": {
+      "Hulk/1.0.0": {
         "runtime": {
-          "HULK.dll": {}
+          "Hulk.dll": {}
         }
       }
     }
   },
   "libraries": {
-    "HULK/1.0.0": {
+    "Hulk/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

@@ -172,6 +172,10 @@ public Print(string Value , TokenTypes type ) : base (Value,type){}
 
   public string Evaluar()
 {
+    if (tokens.Count == 0)
+    {
+        return "";
+    }
     return tokens[0].Evaluar(); 
 }
 }
@@ -184,7 +188,16 @@ public class identificador : token  ,ICloneable
     public identificador(string Value , TokenTypes type) :base(Value , type ){}
     public string Evaluar ()
     {
-     return tokens[0].Evaluar().ToString();
+        try
+        {
+              return tokens[0].Evaluar().ToString();
+        }
+        catch (System.Exception)
+        {
+            Console.WriteLine("error sintactico ,no existe esta variable en este contexto");
+            throw;
+        }
+   
   
     }
     public Object Clone ()
@@ -227,11 +240,29 @@ public class IfElseNode : token
     {
         if (((tokenBul)tokens[0]).Evaluar())
         {
-            return tokens[1].Evaluar().ToString();
+            try
+            {
+                return tokens[1].Evaluar().ToString();
+            }
+            catch (System.Exception)
+            {
+                Console.WriteLine("error en ejecucion en la funcion if - else ");
+                throw;
+            }
+           
         }
         else
         {
-          return tokens[2].Evaluar().ToString();
+            try
+            {
+                   return tokens[2].Evaluar().ToString();
+            }
+            catch (System.Exception)
+            {
+                Console.WriteLine("error en ejcucion en la funcion if - else ");
+                throw;
+            }
+          
 
         }
 
@@ -579,7 +610,6 @@ public class Function :token , ICloneable
             {
                 return tokens[1].tokens[2].Evaluar ().ToString();
             }
-            
             }
         }
         for (int i = 0; i < b.tokens.Count; i++)
@@ -671,8 +701,9 @@ public class Function :token , ICloneable
         
         cadenas.Add(tokens[0].tokens[i].Value);
      }
-    
-     string k = CambioF( lista ,tokens[0],this , cadenas);
+    if (this.tokens[1] is IfElseNode)
+    {
+         string k = CambioF( lista ,tokens[0],this , cadenas);
     // lista = cambioV2( lista ,parametro ,  new tokenNumero(valor , TokenTypes.Number));
      lista = cambioV2(lista ,this , new tokenNumero(k , TokenTypes.Number));
      for (int i = 0; i < virg.Count; i++)
@@ -681,6 +712,12 @@ public class Function :token , ICloneable
      }
     this.tokens = lista;
     return tokens [1].tokens[1].Evaluar();
+    }
+    else
+    {
+        return tokens[1].Evaluar();
+    }
+    
     }
 public static token asignacion (token a , string value , TokenTypes type )
 {
@@ -744,15 +781,17 @@ public class LetIn : token
     {
         tokens = cambioV2(tokens);
         tokens[0].tokens = cambioV2(tokens[0].tokens);
-       
+       if (tokens.Count > 0)
+       {
             try
             {   
                  return tokens[0].Evaluar() ;
             }
             catch (System.Exception)
             {
-                Console.WriteLine("error en ejecucuion del let-in ");
+                Console.WriteLine("error en ejecuion del let-in ");
             }
+        }
          throw new ArgumentException();
         }
        
