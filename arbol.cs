@@ -14,16 +14,15 @@ public  class Parser :token
     public static List<token> fuc2 {get ; set ;}
     public static List<token> variables2 {get ; set;}
 
-    public Parser() :base(value , Type)
+    public Parser(Parser root) :base(value , Type)
     {
-        //this.Root = new token(null ,TokenTypes.Literal);
+         this.Root = root;
         this.position = 0;
         tokens = new List<token>();
         variables = new List<token>();
         parameters = new List<token>();
         fuc = new List<token>();
-        fuc2 = new List<token>();
-        variables2 = new List<token>();
+    
     }
 
 //parsea el arbol 
@@ -56,7 +55,16 @@ public void Evaluate (List<token> b )
         {
             evaluar = ((OperatorNode)item).Evaluar().ToString();
             Console.WriteLine(evaluar);
-        
+        }
+        else if (item.Value == "let")
+        {
+            
+            evaluar = ((LetIn)item).Evaluar().ToString();
+            Console.WriteLine(evaluar);
+        }
+        else if (item.Value == ">")
+        {
+            evaluar = ((tokenBul)item).Evaluar().ToString();
         }
         else if (item.Value == "Print")
         {
@@ -76,13 +84,13 @@ public void Evaluate (List<token> b )
         {
             int k = FindFun(item , variables);
             Function funcion = (Function)variables[k];
+            funcion.globales = variables;
             funcion.parametro = item.tokens[0];
-            evaluar = ((Function)funcion).Evaluar().ToString();
-            Console.WriteLine(evaluar);
+           Console.WriteLine(funcion.Evaluar().ToString()); 
         }
         else if(item.tokens != null)
         {
-              Evaluate(item.tokens );
+              Evaluate(item.tokens);
         }
        
     }      
@@ -120,8 +128,7 @@ public void Evaluate (List<token> b )
                 expresiones();
             }
             else  
-            
-        {
+            {
                 tokens.Add(ParseExpression());
             }
     }
@@ -144,10 +151,16 @@ public void Evaluate (List<token> b )
             if (position + 1 < expression.Count)
             {
                  position++;
-             c = expression[position].Value ;
+               c = expression[position].Value ;
             }
-           
-            
+          }
+          if (leftNode != null && leftNode is OperatorNode && c == ")")
+          {
+          if (position + 1 < expression.Count)
+            {
+                 position++;
+               c = expression[position].Value ;
+            }
           }
             //si encuentra una funcion
              if(Isfunction(c))
@@ -192,11 +205,9 @@ public void Evaluate (List<token> b )
             {
                 return ParseTerm();
             }
-          
             //si encuentra un operador de estos 
             else if (c == ">" || c == "<" || c == "<=" || c == ">=" ||  c == "!=" || c == "==" )
             {
-               
                 position++;
                 token rigthNode = ParseTerm();
                 tokenBul condicion = new tokenBul(c,TokenTypes.Condicional);
@@ -214,6 +225,11 @@ public void Evaluate (List<token> b )
                 condicion.tokens.Add((tokenBul)rigthNode);
                 return condicion;
 
+            }
+            else if (c == "let")
+            {
+                position++;
+                return LETIN(c);
             }
             else
             {
@@ -237,8 +253,8 @@ public void Evaluate (List<token> b )
                 OperatorNode operatorNode = new OperatorNode(c , TokenTypes.Operator);
                 position++;
                 token rightNode = ParseFactor();
-                operatorNode.tokens.Add((tokenNumero)leftNode);
-                operatorNode.tokens.Add((tokenNumero)rightNode);
+                 operatorNode.tokens.Add(leftNode);
+                operatorNode.tokens.Add(rightNode);
                 leftNode = operatorNode;
             }
             else
@@ -269,6 +285,46 @@ public void Evaluate (List<token> b )
            node = k;
            position++;
         }
+        else if( encuentro(expression[position].Value , Root.variables) != -1 || encuentro(expression[position].Value , fuc) != -1 )
+        {
+          Function p = new Function(expression[position].Value , TokenTypes.funcion );
+            position++;
+            token com = new token("," , TokenTypes.Keyword);
+            if (expression[position].Value == "(")
+            {
+                position++;
+            }
+            for (int i = position; i < expression.Count; i++)
+            {
+                       com.tokens.Add(ParseExpression());
+                       if (expression[position].Value == ",")
+                       {
+                        position++;
+                        continue;
+                       } 
+                       if (expression[position].Value == ")")
+                       {
+                        position++;
+                        break;
+                       }
+                    }
+                     p.tokens.Add(com);
+                     
+                     
+                     if (encuentro(p.Value , Root.variables) != -1)
+                     {
+                        int j = encuentro(p.Value , Root.variables);
+                        if (p.tokens[0].tokens.Count != Root.variables[j].tokens[0].tokens.Count )
+                        {
+                            Console.WriteLine("error semantico , la funcion " + p.Value  + " no recive " + p.tokens[0].tokens .Count + " paramatros");
+                            throw new ArgumentException();
+                        }
+                       p.tokens.Add(Root.variables[j].tokens[1]);
+                       p.globales.Add(Root.variables[j]);
+                        return p;
+                     }
+                    node = p;
+        }
         else if(position >= 2 && expression[position].Type == TokenTypes.Identifier && expression[position - 2].Type == TokenTypes.funcion)
         {
             node = expression[position];
@@ -282,17 +338,11 @@ public void Evaluate (List<token> b )
             position++;
 
         }
-        
         else
         {
         string c = expression[position].Value;
-            
-         if (expression[position].Value == "let"  )
-        {
-            position++;
-            node = ParseExpression();
-        }
-        else if (expression[position].Type == TokenTypes.Identifier && expression[position -1 ].Value == "let")
+       
+         if (expression[position].Type == TokenTypes.Identifier && expression[position -1 ].Value == "let")
         {
             identificador iden = (identificador)expression[position];
             position++;
@@ -300,17 +350,12 @@ public void Evaluate (List<token> b )
             variables.Add(iden);
             node = ParseExpression();
         }
-        else if( encuentro(expression[position].Value , Root.variables) != -1 || encuentro(expression[position].Value , fuc) != -1 )
-        {
-            node = new Function(expression[position].Value , TokenTypes.funcion );
-            position++;
-            node.tokens.Add(ParseExpression());
-            
-        }
+       
         else if(expression[position].Type == TokenTypes.Identifier) 
         {
             node = expression[position];
             position++;
+           
         }
         else if (expression[position].Type == TokenTypes.funcion && expression[position - 1].Value == "function")
         {
@@ -320,7 +365,6 @@ public void Evaluate (List<token> b )
             {
                  node = ParseExpression();
             }
-            
         }
         else if (double.TryParse(c,out double value))
         {
@@ -335,7 +379,7 @@ public void Evaluate (List<token> b )
             position++;
             if (expression[position].Value == "\"")
             {
-                position++;
+                return node ;
             }
             else 
             {
@@ -346,10 +390,9 @@ public void Evaluate (List<token> b )
             {
                 Console.WriteLine("error falta un }");
             }
-            
         } 
         //si es una coma continue o algunas de estas cosas seguir en lo suyo
-         else if (c == "(" || c == "{" || c =="\"" || c == "=" || c == "in" || c == "function" || c == "=>" )
+         else if (c == "(" || c == "{" || c =="\"" || c == "="  || c == "function" || c == "=>"  )
         {
         
             if (position == expression.Count && expression[position - 1].Value != ")")
@@ -367,10 +410,15 @@ public void Evaluate (List<token> b )
                position++;
                node = ParseExpression();
         }
+      /* else if (IsOperator(c))
+        {
+            node =  ParseExpression();
+        }*/
         else if (c == "Print")
         {
             position++;
-            node = parserPrint(expression[position - 1]);
+            Print a = new Print(c , TokenTypes.Keyword);
+            node = parserPrint(a);
         }
         else if(Isfunction(c))
         {
@@ -387,6 +435,11 @@ public void Evaluate (List<token> b )
             position++;
             node = ParseFunction(expression[position - 1]);
         }
+        else if (c == "let")
+        {
+            position++;
+            node = LETIN(c);
+        }
         
        
      }
@@ -400,7 +453,7 @@ public void Evaluate (List<token> b )
     return funcion;
             
 } 
-   //mejorar esto aqui
+
     public token parserPrint(token parent)
     {
             token a = ParseExpression();
@@ -425,23 +478,85 @@ public void Evaluate (List<token> b )
         ifi.tokens.Add(c);
         return ifi;
     }
+public token LETIN(string c )
+{
+       LetIn tok = new LetIn(c , TokenTypes.Keyword);
+
+               for (int i = position; i < expression.Count; position++)
+               {
+                    if (expression[position] is identificador)
+                    {
+                        identificador nodo = (identificador)expression[position];
+                        position++;
+                        nodo.tokens.Add(ParseExpression());
+                       // variables.Add(iden);
+                       tok.variables.Add(nodo);
+                       if (expression[position].Value == "\"")
+                       {
+                        position++;
+                       }
+                       if (expression[position].Value == ",")
+                       {
+                        continue;
+                       } 
+                       if (expression[position].Value == "in")
+                       {
+                        break;
+                       }
+                       
+                    }
+               }
+                    if (expression[position].Value == "in")
+                    {
+                        position++;
+                        tok.tokens.Add(ParseTerm());
+                        
+                    }
+                    return tok ;
+            }
+                
 
 public void ParseFUC(token b)
 {
             fuc.Add(expression[position]);
             Function iden = (Function)b;
             position++;
-            token a = ParseExpression();
-            iden.tokens.Add(a);
+            if (expression[position].Value == "(")
+            {
+                position++;
+            }
+            token coma = new token("," , TokenTypes.Keyword);
+             for (int i = position; i < expression.Count; i++)
+               {
+                    if (expression[position] is identificador)
+                    {
+                        identificador nodo = (identificador)expression[position];
+                        position++;
+                        nodo.tokens.Add(ParseExpression());
+                       // variables.Add(iden);
+                       coma.tokens.Add(nodo);
+                       if (expression[position].Value == ",")
+                       {
+                        //coma.tokens.Add(nodo);
+                        position++;
+                        continue;
+                       } 
+                       if (expression[position].Value == ")")
+                       {
+                        break;
+                       }
+                    }
+               }
              if(expression[position].Value == ")")
             {
-             position++;
+              position++;
             }
-            a = ParseExpression();
-            iden.tokens.Add(a);
+            iden.tokens.Add(coma);
+            iden.tokens.Add(ParseExpression());
             Root.variables.Add(iden);
             
-            }
+}
+
     public  token FinIndeX (token a)
     {
         for (int i = 0 ; i < variables.Count; i++)
@@ -468,7 +583,7 @@ public static int FindFun(token a , List<token> variables )
             return i;
         }
     }
-    Console.WriteLine("funcion no definida");
+ 
     return -1;
 }
  public static  int encuentro(string a , List<token> b)
@@ -483,7 +598,10 @@ public static int FindFun(token a , List<token> variables )
     return -1;
 
 }
-
+ public static bool IsOperator(string c)
+    {
+        return c == "+" || c == "-" || c == "*" || c == "/" ;
+    }
 public void agregar (Parser a )
 {
     tokens.Add(a);
