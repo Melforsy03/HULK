@@ -2,7 +2,7 @@
 using Tokenizador;
 using Abol;
 
-namespace Usuario
+namespace usuario
 {
      public class A 
     {

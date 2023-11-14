@@ -1,5 +1,5 @@
 ﻿using AST;
-using Usuario;
+using usuario;
 using System.Text.RegularExpressions;
 namespace Tokenizador
 {
@@ -222,7 +222,7 @@ public static List<string> Corregir(List<token> expression)
                      c = true;
                     break;
                   }
-                  else if ( tokens[tokens.Count-1 ].Value == "in" && encuentro(currentToken , Usuario.A.root.fuc) != -1)
+                  else if ( tokens[tokens.Count-1 ].Value == "in" && encuentro(currentToken , usuario.A.root.fuc) != -1)
                   {
                      tokens.Add(new Function (currentToken , TokenTypes.funcion));
                      i = j;
