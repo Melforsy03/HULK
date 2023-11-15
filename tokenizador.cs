@@ -39,7 +39,7 @@ public static List<string> Corregir(List<token> expression)
         if (expression[expression.Count - 1].Value !=";")
         {
              errores.Add("error sintactico , esperabamos un ;");
-             continue;
+             break;
         }
         if (expression[i].Value == "in" )
         {
