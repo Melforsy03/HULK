@@ -18,14 +18,13 @@ namespace Usuario
               if(a == "" )break;
                List<token> alfa = input.ERROR(a);
                Parser ganma = new Parser(root);
-                if (alfa != null)
+            if (alfa != null)
            {
               ganma.expression = alfa;
               ganma.construir();
               root.agregar(ganma);
               root.fuc = root.variables;
               ganma.Root = root;
-                root.EvaluateO();
            }
           }
           
