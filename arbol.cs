@@ -46,12 +46,7 @@ public void Evaluate (List<token> b )
      {
         continue;
      }
-         if (item.Value == "+")
-        {
-            evaluar = ((OperatorNode)item).Evaluar().ToString();
-            Console.WriteLine(evaluar);
-        }
-        else if(item.Value== "-")
+         if (IsOperator(item.Value ))
         {
             evaluar = ((OperatorNode)item).Evaluar().ToString();
             Console.WriteLine(evaluar);
@@ -65,11 +60,12 @@ public void Evaluate (List<token> b )
         else if (item.Value == ">")
         {
             evaluar = ((tokenBul)item).Evaluar().ToString();
+            Console.WriteLine(evaluar);
         }
         else if (item.Value == "Print")
         {
             evaluar = item.Evaluar();
-        }
+            Console.WriteLine(evaluar);        }
         else if (item.Value == "if")
         {
             evaluar = ((IfElseNode)item).Evaluar().ToString();
@@ -310,7 +306,6 @@ public void Evaluate (List<token> b )
                     }
                      p.tokens.Add(com);
                      
-                     
                      if (encuentro(p.Value , Root.variables) != -1)
                      {
                         int j = encuentro(p.Value , Root.variables);
@@ -319,8 +314,16 @@ public void Evaluate (List<token> b )
                             Console.WriteLine("error semantico , la funcion " + p.Value  + " no recive " + p.tokens[0].tokens .Count + " paramatros");
                             throw new ArgumentException();
                         }
-                       p.tokens.Add(Root.variables[j].tokens[1]);
-                       p.globales.Add(Root.variables[j]);
+                       p = (Function)Root.variables[j];
+                       for (int l = 0; l < p.tokens[0].tokens.Count ; l++)
+                       {
+                        if (com.tokens[l] is tokenNumero)
+                        {
+                              p.tokens[0].tokens[l].tokens[0] = com.tokens[l];
+                        }
+                           
+                       }
+                      p.globales.Add(Root.variables[j]);
                         return p;
                      }
                     node = p;
@@ -341,8 +344,7 @@ public void Evaluate (List<token> b )
         else
         {
         string c = expression[position].Value;
-       
-         if (expression[position].Type == TokenTypes.Identifier && expression[position -1 ].Value == "let")
+         if (position > 0 && expression[position].Type == TokenTypes.Identifier && expression[position - 1 ].Value == "let")
         {
             identificador iden = (identificador)expression[position];
             position++;
@@ -350,8 +352,7 @@ public void Evaluate (List<token> b )
             variables.Add(iden);
             node = ParseExpression();
         }
-       
-        else if(expression[position].Type == TokenTypes.Identifier) 
+        else if(expression[position].Type == TokenTypes.Identifier && c != "function" && c != "let") 
         {
             node = expression[position];
             position++;

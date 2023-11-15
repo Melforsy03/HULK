@@ -527,6 +527,7 @@ public class FunctionNode : token
 public class Function :token , ICloneable
 {
     public List<token> globales {get ; set ;}
+    public List<token> number {get ; set;}
     public Function(String Value , TokenTypes Type) : base(Value , Type)
     {
            globales = new List<token>();
@@ -703,7 +704,7 @@ public class Function :token , ICloneable
      }
     if (this.tokens[1] is IfElseNode)
     {
-         string k = CambioF( lista ,tokens[0],this , cadenas);
+    string k = CambioF( lista ,tokens[0],this , cadenas);
     // lista = cambioV2( lista ,parametro ,  new tokenNumero(valor , TokenTypes.Number));
      lista = cambioV2(lista ,this , new tokenNumero(k , TokenTypes.Number));
      for (int i = 0; i < virg.Count; i++)

@@ -268,7 +268,7 @@ public static List<string> Corregir(List<token> expression)
                     }
                     break;
                   }
-                  else
+                   else
                   {
                         tokens.Add(new identificador(currentToken , TokenTypes.Identifier));
                         currentToken = "";
@@ -277,8 +277,10 @@ public static List<string> Corregir(List<token> expression)
                     
                   }
                 }
-                }
             }
+            }
+        }
+            
                 if (c == true )
                 {
                     c = false ;
@@ -318,8 +320,8 @@ public static List<string> Corregir(List<token> expression)
                 continue;
             }
            
-          }
-        }
+            }
+        
                 if (i < input.Length)
                 {
                  if(input[i] == ')' ||IsOperator(input[i].ToString()) || input[i] == ';' || input[i] == '(' || input[i] == ',')
@@ -341,17 +343,45 @@ public static List<string> Corregir(List<token> expression)
                      tokens.Add(new identificador (currentToken , TokenTypes.Identifier));
                      continue;
                 }
+                }
+                }
+                else  if (tokens.Count == 0)
+                {
+                    for (int j = i + 1; j < input.Length; j++)
+                    {
+                        if (input[j] != ' ')
+                        {
+                            currentToken += input[j];
+                        }
+                        else
+                        {
+                                i = j ;
+                            break ;
                     
-            } 
-           
-         
-        }
-             }
-             }
-        }
-        }
-          return tokens;
+                        }
+                    }
+                    if (currentToken == "function")
+                    {
+                        tokens.Add(new token (currentToken , TokenTypes.Keyword));
+                        currentToken = "";
+                        continue;
+                    }
+                    else
+                    {
+                        tokens.Add(new identificador (currentToken , TokenTypes.Identifier));
+                    currentToken = "";
+                    continue;
+                    }
+                  
+                }
+                    
              
+        }
+             }
+             }
+        }
+        
+          return tokens;
     }
 
    public static bool IsOperator(string c)
