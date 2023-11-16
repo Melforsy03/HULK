@@ -422,7 +422,7 @@ public static List<string> Corregir(List<token> expression)
     }
    public  static bool Isfunction(string c)
    {
-        return c == "sin" || c == "cos" || c == "tan" || c == "sqrt"  || c == "^";
+        return c == "sin" || c == "cos" || c == "tan" || c == "Sqrt"  || c == "^";
   }
   public static int encuentro(string a ,List<token> b)
   {

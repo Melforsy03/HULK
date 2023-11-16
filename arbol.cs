@@ -46,7 +46,7 @@ public void Evaluate (List<token> b )
      {
         continue;
      }
-         if (IsOperator(item.Value ))
+         if (IsOperator(item.Value ) || item.Value == "Sqrt")
         {
             evaluar = ((OperatorNode)item).Evaluar().ToString();
             Console.WriteLine(evaluar);
@@ -71,7 +71,7 @@ public void Evaluate (List<token> b )
             evaluar = ((IfElseNode)item).Evaluar().ToString();
             Console.WriteLine(evaluar);
         }
-        else if(Isfunction(item.Value))
+        else if(Isfunction(item.Value) && item.Value != "Sqrt")
         {
                 evaluar = ((FunctionNode)item).Evaluar().ToString();
                 Console.WriteLine(evaluar); 
@@ -119,9 +119,21 @@ public void Evaluate (List<token> b )
             }
             else if(Isfunction(expression[position].Value))
             {
+            
+                if (expression[position ].Value == "Sqrt")
+                {
                 position++;
+                 OperatorNode n = new OperatorNode (expression[position- 1].Value , TokenTypes.Operator) ;
+                 n.tokens.Add(ParseExpression());
+                 tokens.Add(n);
+                 expresiones();
+                }
+                else
+                {
+                    position++;
                 tokens.Add(ParseFunction(expression[position - 1] ));
                 expresiones();
+                }
             }
             else  
             {
@@ -244,7 +256,7 @@ public void Evaluate (List<token> b )
         {
             string c = expression[position].Value;
 
-            if (c == "*" || c == "/")
+            if (c == "*" || c == "/" || c == "^" )
             {
                 OperatorNode operatorNode = new OperatorNode(c , TokenTypes.Operator);
                 position++;
@@ -365,6 +377,14 @@ public void Evaluate (List<token> b )
                  node = ParseExpression();
             }
         }
+         else if ( c == "Sqrt")
+       {
+        position++;
+         OperatorNode n = new OperatorNode (c , TokenTypes.Operator) ;
+        node = ParseExpression();
+        n.tokens.Add(node);
+        return n ;
+       }
         else if (double.TryParse(c,out double value))
         {
             double val = value;
@@ -402,6 +422,7 @@ public void Evaluate (List<token> b )
             position++;
             node = parserIFelse();
         }
+      
         else if (c == "else")
         {
             position++;
@@ -418,7 +439,7 @@ public void Evaluate (List<token> b )
      return node ;
   }
     //Para recorrer las funciones
-    public  token ParseFunction(token funcion )
+public  token ParseFunction(token funcion )
 {
     token a = ParseExpression();
     funcion.tokens.Add(a);
@@ -543,7 +564,7 @@ public void ParseFUC(token b)
   
    public  static bool Isfunction(string c)
    {
-        return c == "sin" || c == "cos" || c == "tan" || c == "sqrt"  || c == "^";
+        return c == "sin" || c == "cos" || c == "tan" || c == "Sqrt"  || c == "^";
   }
 
 public static int FindFun(token a , List<token> variables )
