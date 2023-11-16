@@ -14,7 +14,8 @@ namespace Usuario
           Parser root = new Parser(null);
           while(true)
           {
-              string a = Console.ReadLine();
+             string a = Console.ReadLine();
+             // string a = " Print ( if  ( 6 > 9 )  4 + 5  else { Print ( 10 * 10 ) } ) ;";
              // string a = "function sum ( a , b ) => if ( a > 0) sum ( a - 1 , b) + b else  {0} ; ";
              // string b = "let a = 2 , b = 6 in sum (a , b) ;";
               if(a == "" )
@@ -33,14 +34,14 @@ namespace Usuario
               root.agregar(ganma);
               root.fuc = root.variables;
               ganma.Root = root;
-/*
-              bit.expression = beta;
+            // root.EvaluateO();
+             // break;
+              /*bit.expression = beta;
               bit.construir();
               root.agregar(bit);
               root.fuc = root.variables;
-              bit.Root = root;
-               root.EvaluateO();
-               break;*/
+              bit.Root = root;*/
+               
 
            }
           }

@@ -270,10 +270,22 @@ public static List<string> Corregir(List<token> expression)
                   }
                    else
                   {
+                    if (IsKeyWords(currentToken))
+                    {
+                        tokens.Add(new token(currentToken  , TokenTypes.Keyword));
+                        currentToken = "";
+                        i = j ; 
+                        c = true ;
+                        break;
+                        
+                    }
+                    else
+                    {
                         tokens.Add(new identificador(currentToken , TokenTypes.Identifier));
                         currentToken = "";
                         i = j;
                         break;
+                    }
                     
                   }
                 }
@@ -368,9 +380,20 @@ public static List<string> Corregir(List<token> expression)
                     }
                     else
                     {
-                        tokens.Add(new identificador (currentToken , TokenTypes.Identifier));
+                        if (IsKeyWords(currentToken))
+                    {
+                        tokens.Add(new token(currentToken  , TokenTypes.Keyword));
+                        currentToken = "";
+                        continue ;
+                        
+                    }
+                    else
+                    {
+                        
+                    tokens.Add(new identificador (currentToken , TokenTypes.Identifier));
                     currentToken = "";
                     continue;
+                    }
                     }
                   
                 }
@@ -386,7 +409,7 @@ public static List<string> Corregir(List<token> expression)
 
    public static bool IsOperator(string c)
     {
-        return c == "+" || c == "-" || c == "*" || c == "/" ;
+        return c == "+" || c == "-" || c == "*" || c == "/" || c == "%" ;
     }
 
   public  static bool IsPunctuation(string c)

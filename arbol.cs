@@ -34,7 +34,7 @@ public void construir()
 public void EvaluateO()
 {
 
-    //List<String> A = new List<string>();
+   
       Evaluate(tokens );
 }
 public void Evaluate (List<token> b )
@@ -107,7 +107,7 @@ public void Evaluate (List<token> b )
             if (expression[position].Value == "Print")
             {
                position++;
-               tokens.Add(parserPrint(expression[position - 1]));
+               tokens.Add(parserPrint(new Print ("Print" , TokenTypes.Keyword)));
                expresiones();  
             }
            
@@ -317,11 +317,9 @@ public void Evaluate (List<token> b )
                        p = (Function)Root.variables[j];
                        for (int l = 0; l < p.tokens[0].tokens.Count ; l++)
                        {
-                        if (com.tokens[l] is tokenNumero)
-                        {
-                              p.tokens[0].tokens[l].tokens[0] = com.tokens[l];
-                        }
-                           
+                       
+                        p.tokens[0].tokens[l].tokens[0] = com.tokens[l];
+                       
                        }
                       p.globales.Add(Root.variables[j]);
                         return p;
@@ -378,43 +376,16 @@ public void Evaluate (List<token> b )
         {
             node = new tokenLiteral(expression[position].Value , TokenTypes.Literal);
             position++;
-            if (expression[position].Value == "\"")
-            {
                 return node ;
-            }
-            else 
-            {
-                Console.WriteLine("error falto un \" ");
-            }
-           
-            if (expression[position].Value != "}" && position == expression.Count - 1)
-            {
-                Console.WriteLine("error falta un }");
-            }
+          
         } 
         //si es una coma continue o algunas de estas cosas seguir en lo suyo
          else if (c == "(" || c == "{" || c =="\"" || c == "="  || c == "function" || c == "=>"  )
         {
-        
-            if (position == expression.Count && expression[position - 1].Value != ")")
-            {
-                Console.WriteLine("Expresión inválida , se esperaba un parentesis");
-            }
-            else if (position == expression.Count && expression[position - 1].Value != "}")
-            {
-                Console.WriteLine("Expresion invalida , se esperaba un corchete ");
-            }
-            else if (position == expression.Count && expression[position - 1].Value != "\"")
-            {
-                Console.WriteLine("Expresion invalida , se esperaba un corchete ");
-            }
                position++;
                node = ParseExpression();
         }
-      /* else if (IsOperator(c))
-        {
-            node =  ParseExpression();
-        }*/
+     
         else if (c == "Print")
         {
             position++;

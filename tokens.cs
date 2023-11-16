@@ -97,15 +97,19 @@ public object Clone ()
     {
         return Value;
     }
-     else if(this.Type is TokenTypes.Condicional)
+     else if(this is tokenBul)
     {
         return ((tokenBul)this).Evaluar().ToString();
+    }
+    else if ( this  is IfElseNode )
+    {
+        return ((IfElseNode)this).Evaluar().ToString();
     }
     else if (this is Function)
     {
     return ((Function)this).Evaluar().ToString();
     }
-    else if(this is Print)
+    else if(this is Print )
     {
         return ((Print)this).Evaluar().ToString();
     }
@@ -138,7 +142,7 @@ public object Clone ()
     {
         return ((FunctionNode)tokens[0]).Evaluar().ToString();
     }
-    else if (tokens[0].Type == TokenTypes.Condicional)
+    else if (tokens[0].Type == TokenTypes.Condicional && tokens[0].Value != "if")
     {
         return ((tokenBul)tokens[0]).Evaluar().ToString();
     }
@@ -321,6 +325,18 @@ public class OperatorNode : token
             try
             {
                 return double.Parse(tokens[0].Evaluar()) / double.Parse(tokens[1].Evaluar()) ;  
+            }
+            catch (System.Exception)
+            {
+                Console.WriteLine(" error en ejecucuion ,el operador " + Value + " no puede operar con estos elementos");
+            }
+        
+       }
+        else if (Value == "%")
+       {
+            try
+            {
+                return double.Parse(tokens[0].Evaluar()) % double.Parse(tokens[1].Evaluar()) ;  
             }
             catch (System.Exception)
             {
