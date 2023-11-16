@@ -24,8 +24,7 @@ namespace Usuario
                  break;
               }
                List<token> alfa = input.ERROR(a);
-              // List<token> beta = input.ERROR(b);
-              // Parser bit = new Parser(root);
+
                Parser ganma = new Parser(root);
             if (alfa != null)
            {
@@ -34,14 +33,7 @@ namespace Usuario
               root.agregar(ganma);
               root.fuc = root.variables;
               ganma.Root = root;
-            // root.EvaluateO();
-             // break;
-              /*bit.expression = beta;
-              bit.construir();
-              root.agregar(bit);
-              root.fuc = root.variables;
-              bit.Root = root;*/
-               
+            
 
            }
           }
