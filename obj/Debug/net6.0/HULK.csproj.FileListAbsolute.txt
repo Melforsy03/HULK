@@ -28,3 +28,18 @@ C:\Users\fosythe´s family\Desktop\Mel\compilador\HULK\obj\Debug\net6.0\Hulk.dll
 C:\Users\fosythe´s family\Desktop\Mel\compilador\HULK\obj\Debug\net6.0\ref\Hulk.dll
 C:\Users\fosythe´s family\Desktop\Mel\compilador\HULK\obj\Debug\net6.0\Hulk.pdb
 C:\Users\fosythe´s family\Desktop\Mel\compilador\HULK\obj\Debug\net6.0\Hulk.genruntimeconfig.cache
+C:\Users\fosythe´s family\Desktop\proyecto Hulk\obj\Debug\net6.0\Hulk.csproj.AssemblyReference.cache
+C:\Users\fosythe´s family\Desktop\proyecto Hulk\obj\Debug\net6.0\Hulk.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\fosythe´s family\Desktop\proyecto Hulk\obj\Debug\net6.0\Hulk.AssemblyInfoInputs.cache
+C:\Users\fosythe´s family\Desktop\proyecto Hulk\obj\Debug\net6.0\Hulk.AssemblyInfo.cs
+C:\Users\fosythe´s family\Desktop\proyecto Hulk\obj\Debug\net6.0\Hulk.csproj.CoreCompileInputs.cache
+C:\Users\fosythe´s family\Desktop\proyecto Hulk\obj\Debug\net6.0\Hulk.dll
+C:\Users\fosythe´s family\Desktop\proyecto Hulk\obj\Debug\net6.0\ref\Hulk.dll
+C:\Users\fosythe´s family\Desktop\proyecto Hulk\obj\Debug\net6.0\Hulk.pdb
+C:\Users\fosythe´s family\Desktop\proyecto Hulk\bin\Debug\net6.0\Hulk.exe
+C:\Users\fosythe´s family\Desktop\proyecto Hulk\bin\Debug\net6.0\Hulk.deps.json
+C:\Users\fosythe´s family\Desktop\proyecto Hulk\bin\Debug\net6.0\Hulk.runtimeconfig.json
+C:\Users\fosythe´s family\Desktop\proyecto Hulk\bin\Debug\net6.0\Hulk.dll
+C:\Users\fosythe´s family\Desktop\proyecto Hulk\bin\Debug\net6.0\ref\Hulk.dll
+C:\Users\fosythe´s family\Desktop\proyecto Hulk\bin\Debug\net6.0\Hulk.pdb
+C:\Users\fosythe´s family\Desktop\proyecto Hulk\obj\Debug\net6.0\Hulk.genruntimeconfig.cache

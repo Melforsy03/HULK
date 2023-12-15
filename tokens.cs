@@ -3,17 +3,18 @@ using Tokenizador;
 namespace AST
 {
     //tipos de token 
- public enum TokenTypes
-{
-    Keyword , Identifier ,Number, Operator, Punctuation ,Literal  , funcion , boolean, letIn , ErrorType
-} 
-//nodo token con valor string y tipo de token 
-public abstract class metodo
-{
+  public enum TokenTypes
+  {
+    Keyword , Identifier ,Number, Operator, Punctuation ,Literal , funcion , boolean, letIn , ErrorType , comparacion
+  } 
+ //nodo token con valor string y tipo de token 
+  public abstract class metodo
+  {
     public abstract string Evaluar();
-}
-public class token : metodo , ICloneable
-{
+  }
+
+  public class token : metodo , ICloneable
+  {
     public List<token> tokens {get; set;}
     public string Value { get; set; }
     public TokenTypes Type { get; set; }
@@ -25,68 +26,71 @@ public class token : metodo , ICloneable
         Type = type;
         tokens = new List<token>();
     }
-public object Clone ()
-{
-   if(this is LetIn) return ((LetIn)this).Clone();
-    else if(this is Print)return ((Print)this).Clone();
-    else if (this is OperatorNode)return ((OperatorNode)this).Clone();
-    else if (this is Identificador) return ((Identificador)this).Clone();
-    else if (this is tokenNumero)return ((tokenNumero)this).Clone();
-    else if (this is tokenBul) return ((tokenBul)this).Clone();
-    else if(this is IfElseNode) return ((IfElseNode)this).Clone();
-    else if (this is tokenLiteral)return ((tokenLiteral)this).Clone();
-    else
+    public object Clone ()
     {
+     if(this is LetIn) return ((LetIn)this).Clone();
+     else if(this is Print)return ((Print)this).Clone();
+     else if (this is OperatorNode)return ((OperatorNode)this).Clone();
+     else if (this is Identificador) return ((Identificador)this).Clone();
+     else if (this is tokenNumero)return ((tokenNumero)this).Clone();
+     else if (this is tokenBul) return ((tokenBul)this).Clone();
+     else if(this is IfElseNode) return ((IfElseNode)this).Clone();
+     else if (this is tokenLiteral)return ((tokenLiteral)this).Clone();
+     else if (this is FunctionNode)return ((FunctionNode)this).Clone();
+     else
+     {
       return ((FunctionHulk)this).Clone();
+     }
     }
-}
- public override string Evaluar()
- {
-    if(this is LetIn) return ((LetIn)this).Evaluar();
-    else if(this is Print)return ((Print)this).Evaluar();
-    else if (this is OperatorNode)return ((OperatorNode)this).Evaluar().ToString();
-    else if (this is Identificador) return ((Identificador)this).Evaluar();
-    else if (this is tokenNumero)return ((tokenNumero)this).Evaluar().ToString();
-    else if (this is tokenBul) return ((tokenBul)this).Evaluar().ToString();
-    else if(this is IfElseNode) return ((IfElseNode)this).Evaluar();
-    else if (this is tokenLiteral)return ((tokenLiteral)this).Evaluar();
-    else
+    public override string Evaluar()
     {
+     if(this is LetIn) return ((LetIn)this).Evaluar();
+     else if(this is Print)return ((Print)this).Evaluar();
+     else if (this is OperatorNode)return ((OperatorNode)this).Evaluar();
+     else if (this is Identificador) return ((Identificador)this).Evaluar();
+     else if (this is tokenNumero)return ((tokenNumero)this).Evaluar().ToString();
+     else if (this is tokenBul) return ((tokenBul)this).Evaluar().ToString();
+     else if(this is IfElseNode) return ((IfElseNode)this).Evaluar();
+     else if (this is tokenLiteral)return ((tokenLiteral)this).Evaluar();
+     else if (this is FunctionNode)return ((FunctionNode)this).Evaluar().ToString();
+     else
+     {
       return ((FunctionHulk)this).Evaluar();
-    }
+     }
     
- }
- public bool CheckSemantic(List<Errors> errors)
- {
-    if(this is LetIn) return ((LetIn)this).CheckSemantic(errors);
-    else if(this is Print)return ((Print)this).CheckSemantic(errors);
-    else if (this is OperatorNode)return ((OperatorNode)this).CheckSemantic(errors);
-    else if (this is Identificador) return ((Identificador)this).CheckSemantic(errors);
-    else if (this is tokenNumero)return ((tokenNumero)this).CheckSemantic(errors);
-    else if (this is tokenBul) return ((tokenBul)this).CheckSemantic(errors);
-    else if(this is IfElseNode) return ((IfElseNode)this).CheckSemantic(errors);
-    else if (this is tokenLiteral)return ((tokenLiteral)this).CheckSemantic(errors);
-    else
-    {
-      return ((FunctionHulk)this).CheckSemantic(errors);
     }
- }
-}
-//token print 
-public class Print :token 
-{
-  public Print(string Value , TokenTypes type ) : base (Value,type){}
+    public bool CheckSemantic(List<Errors> errors)
+   {
+     if(this is LetIn) return ((LetIn)this).CheckSemantic(errors);
+     else if(this is Print)return ((Print)this).CheckSemantic(errors);
+     else if (this is OperatorNode)return ((OperatorNode)this).CheckSemantic(errors);
+     else if (this is Identificador) return ((Identificador)this).CheckSemantic(errors);
+     else if (this is tokenNumero)return ((tokenNumero)this).CheckSemantic(errors);
+     else if (this is tokenBul) return ((tokenBul)this).CheckSemantic(errors);
+     else if(this is IfElseNode) return ((IfElseNode)this).CheckSemantic(errors);
+     else if (this is tokenLiteral)return ((tokenLiteral)this).CheckSemantic(errors);
+     else if (this is FunctionNode)return ((FunctionNode)this).CheckSemantic(errors);
+     else
+     {
+      return ((FunctionHulk)this).CheckSemantic(errors);
+     }
+   }
+  }
+ //token print 
+  public class Print :token 
+ {
+   public Print(string Value , TokenTypes type ) : base (Value,type){}
 
    public string Evaluar()
-  {
+   {
     if (tokens.Count == 0)
     {
         return "";
     }
     return tokens[0].Evaluar(); 
-  }
+   }
     public Print Clone ()
-  {
+   {
     Print objeto = new Print(this.Value , this.Type);
     foreach (var item in this.tokens)
     {
@@ -96,23 +100,22 @@ public class Print :token
   }
   public bool CheckSemantic(List<Errors> errors)
   {
-   
     bool error = tokens[0].CheckSemantic(errors);
     if (!error)
     {
-    errors.Add(new Errors(ErrorCode.Semantic , "error en la funcion Print"));
+       errors.Add(new Errors(ErrorCode.Semantic , "error en la funcion Print"));
        TypeReturn = TokenTypes.ErrorType;
        return false ;
     }
     TypeReturn = tokens[0].TypeReturn;
-    return true ;
+    return true;
     
   }
-}
-//token indentificador de variables 
-//retorna el valor del toquen almacenado 
-public class Identificador : token  ,ICloneable
-{
+ }
+ 
+ //retorna el valor del toquen almacenad
+  public class Identificador : token  ,ICloneable
+ {
     
     //public int position{get ;set;}
     public Identificador(string Value , TokenTypes type) :base(Value , type ){}
@@ -124,8 +127,7 @@ public class Identificador : token  ,ICloneable
       }
       catch(Exception x)
       {
-        throw new ArgumentException("esta variables no contine ningun valor");
-         
+        throw new ArgumentException("la variable " + Value +" no fue definida");
       }
       
     }
@@ -133,9 +135,15 @@ public class Identificador : token  ,ICloneable
    public Identificador Clone ()
   {
     Identificador objeto = new Identificador(this.Value , this.Type);
+    objeto.TypeReturn = this.TypeReturn;
     foreach (var item in this.tokens)
     {
+      if (item != null)
       objeto.tokens.Add((token)item.Clone());
+      else
+      {
+        throw new ArgumentException("la varibale " + Value + " no fue definida correctamente");
+      }
     }
     return objeto;
   }
@@ -143,22 +151,25 @@ public class Identificador : token  ,ICloneable
   {
       bool check = false ;
    
+      if (tokens.Count > 0)
+      {
       check = tokens[0].CheckSemantic(errors);
     
       if (!check)
-    {
+      {
       errors.Add(new Errors (ErrorCode.Semantic , "error en la variable " + Value ));
       TypeReturn = TokenTypes.ErrorType;
       return false ;
-    }
-    if (tokens.Count > 0)TypeReturn = tokens[0].TypeReturn;
+      }
+      TypeReturn = tokens[0].TypeReturn;
+      }
     else {TypeReturn = TokenTypes.Identifier;}
     return true ;
   }
-}
-//token numero que tiene tipo numero y  un valor que es un numero 
-public class tokenNumero: token
-{
+ }
+ //token numero que tiene tipo numero y  un valor que es un numero 
+  public class tokenNumero: token
+ {
     public tokenNumero (string Value , TokenTypes type) : base(Value , type){}
 
     public double Evaluar()
@@ -166,19 +177,19 @@ public class tokenNumero: token
         return double.Parse(Value);
     }
    public tokenNumero Clone ()
-  {
+   {
     tokenNumero objeto = new tokenNumero(this.Value , this.Type);
     
     return objeto;
-  }
-  public bool CheckSemantic(List<Errors> errors)
-  {
+   }
+   public bool CheckSemantic(List<Errors> errors)
+   {
     TypeReturn = TokenTypes.Number;
     return true ;
-  }
-}
-public class tokenLiteral : token 
-{
+   }
+ }
+  public class tokenLiteral : token 
+ {
     public tokenLiteral(string value , TokenTypes types) :base(value ,types ){}
 
     public string Evaluar()
@@ -196,12 +207,12 @@ public class tokenLiteral : token
     TypeReturn = TokenTypes.Literal;
     return true ;
    }
-}
+ }
 
-//token condicional que tiene dos valores if y else , es tipo condicional 
-//tiene un token booleano , un token veradero , un token falso 
-public class IfElseNode : token
-{
+  //token condicional que tiene dos valores if y else , es tipo condicional  
+ //tiene un token booleano , un token veradero , un token falso 
+  public class IfElseNode : token
+ {
     public IfElseNode(string Value ,  TokenTypes Type ) : base(Value , Type ){}
   
     public string Evaluar()
@@ -217,83 +228,109 @@ public class IfElseNode : token
 
     }
     public IfElseNode Clone ()
-  {
-    IfElseNode objeto = new IfElseNode(this.Value , this.Type);
-    foreach (var item in this.tokens)
-    {
+   {
+     IfElseNode objeto = new IfElseNode(this.Value , this.Type);
+     foreach (var item in this.tokens)
+     {
       objeto.tokens.Add((token)item.Clone());
-    }
-    return objeto;
-  }
-  public bool CheckSemantic(List<Errors> errors)
-  {
+     }
+     return objeto;
+   }
+   public bool CheckSemantic(List<Errors> errors)
+   {
     bool condicion = false;
     bool then = false;
     bool elsse = false ;
 
     condicion = tokens[0].CheckSemantic(errors);
-    if(!condicion || tokens[0].TypeReturn == TokenTypes.boolean)
+    if(!condicion)
     {
-      errors.Add(new Errors(ErrorCode.Semantic , "error en la condicion de la expresion if - else"));
+        errors.Add(new Errors(ErrorCode.Semantic , "error en la condicion de la expresion if - else"));
          TypeReturn = TokenTypes.ErrorType;
+         
     }
-    then = tokens[1].CheckSemantic(errors);
+      then = tokens[1].CheckSemantic(errors);
      if(!then)
     {
       errors.Add(new Errors(ErrorCode.Semantic , "error en la instruccion then de la expresion if - else"));
          TypeReturn = TokenTypes.ErrorType;
     }
-    elsse = tokens[2].CheckSemantic(errors);
+      elsse = tokens[2].CheckSemantic(errors);
      if(!elsse)
     {
       errors.Add(new Errors(ErrorCode.Semantic , "error en la instruccion else de la expresion if - else"));
          TypeReturn = TokenTypes.ErrorType;
     }
-    if(!(condicion && then && elsse))
+    if(condicion && then && elsse)
     {
-    return true;
+      TypeReturn = tokens[0].TypeReturn;
+      return true;
     }
     else
     {
       return false;
     }
    
-  }
-}
-//token operador + ,- ,* , / ,^ metodo evaluar que devuelve un double 
-public class OperatorNode : token
-{
+   }
+ }
+ //token operador + ,- ,* , / ,^ metodo evaluar que devuelve un double 
+  public class OperatorNode : token
+ {
      public OperatorNode (string Operator , TokenTypes type) : base(Operator , type){}
 
-    public double Evaluar()
+    public string Evaluar()
     {
+      if (tokens[0].Type == TokenTypes.Identifier && tokens[0].tokens.Count == 0)
+      {
+        throw new ArgumentException("la variable " + tokens[0].Value + " no fue declarada");
+      }
+      if (tokens[1].Type == TokenTypes.Identifier && tokens[1].tokens.Count == 0)
+      {
+        throw new ArgumentException("la variable " + tokens[1].Value + " no fue declarada");
+      }
       try
       {
        if (Value == "+")
        {
-         return double.Parse(tokens[0].Evaluar()) + double.Parse(tokens[1].Evaluar()) ;  
+        string leftnode = tokens[0].Evaluar();
+        string rightNode = tokens[1].Evaluar();
+        try
+        {
+          
+         return (double.Parse(leftnode) + double.Parse(rightNode)).ToString();
+        
+         }
+         catch (System.Exception)
+          {
+           
+           if(!double.TryParse(leftnode ,out double value ) && !double.TryParse(rightNode ,out double Value ))
+            {
+             return leftnode + " " + rightNode;
+            }
+          throw new ArgumentException("no es posible hacer la operacion " + " con estos elementos");
+        }
        }
        else if (Value == "-")
        {
-        return double.Parse(tokens[0].Evaluar()) - double.Parse(tokens[1].Evaluar()) ;     
+        return (double.Parse(tokens[0].Evaluar()) - double.Parse(tokens[1].Evaluar())).ToString();     
        }
        else if (Value == "*")
        {
-        return double.Parse(tokens[0].Evaluar()) * double.Parse(tokens[1].Evaluar()) ;  
+        return (double.Parse(tokens[0].Evaluar()) * double.Parse(tokens[1].Evaluar())).ToString();  
        }
        else if (Value == "/")
        {
-        return double.Parse(tokens[0].Evaluar()) / double.Parse(tokens[1].Evaluar()) ;  
+        return (double.Parse(tokens[0].Evaluar()) / double.Parse(tokens[1].Evaluar())).ToString() ;  
        }
         else if (Value == "%")
        {
-       return double.Parse(tokens[0].Evaluar()) % double.Parse(tokens[1].Evaluar()) ;  
+       return (double.Parse(tokens[0].Evaluar()) % double.Parse(tokens[1].Evaluar())).ToString() ;  
        }
        else 
        {
-        return Math.Pow(double.Parse(tokens[0].Evaluar()) , double.Parse(tokens[1].Evaluar())) ; 
+        return (Math.Pow(double.Parse(tokens[0].Evaluar()) , double.Parse(tokens[1].Evaluar()))).ToString() ; 
        }
-        }
+      }
       catch (System.Exception)
       {
         throw new ArgumentException("el operador " + Value + " no puede operar con estos elementos");
@@ -317,22 +354,20 @@ public class OperatorNode : token
     {
         errors.Add(new Errors(ErrorCode.Semantic , "error en la operacion " + Value + " parametros incorrectos" ));
         TypeReturn = TokenTypes.ErrorType;
-        return false ;
+        return false;
     }
-    check = tokens[0].CheckSemantic(errors);
+     check = tokens[0].CheckSemantic(errors);
      if(!check)
-    {
-      errors.Add(new Errors(ErrorCode.Semantic , "error en la operacion " + Value ));
+     {
+       errors.Add(new Errors(ErrorCode.Semantic , "error en la operacion " + Value ));
        TypeReturn = TokenTypes.ErrorType;
-      
-    }
+     }
      check1 = tokens[1].CheckSemantic(errors);
      if(!check1)
-    {
-      errors.Add(new Errors(ErrorCode.Semantic , "error en la operacion " + Value ));
+     {
+       errors.Add(new Errors(ErrorCode.Semantic , "error en la operacion " + Value ));
        TypeReturn = TokenTypes.ErrorType;
-      
-    }
+     }
     if(tokens[0].Type == TokenTypes.Identifier)
     {
       tokens[0].TypeReturn = tokens[1].TypeReturn;
@@ -341,15 +376,13 @@ public class OperatorNode : token
     {
       tokens[1].TypeReturn = tokens[0].TypeReturn;
     }
-     if(tokens[0].TypeReturn != tokens[1].TypeReturn)
-    {
-       errors.Add(new Errors(ErrorCode.Semantic , "error en la operacion " + Value + " no se puede efectuar esta operacion sobre tipos diferentes"));
-        TypeReturn = TokenTypes.ErrorType;
-        return false ;
-    }
     if((check && check1))
     {
-      TypeReturn = tokens[0].TypeReturn;
+      if (Value != "+")TypeReturn = TokenTypes.Number;
+      else 
+      {
+        TypeReturn = tokens[1].TypeReturn;
+      }
       return true ;
     }
     else
@@ -358,27 +391,73 @@ public class OperatorNode : token
          return false;
     }
   }
-
-}
-//un token valor que tiene un valor que en este caso es el operador , es tipo booleano 
-//tiene dos token numero 
-public class  tokenBul : token
-{
+ }
+ //un token valor que tiene un valor que en este caso es el operador , es tipo booleano 
+ public class  tokenBul : token
+ {
    public tokenBul(string Value , TokenTypes type) : base(Value , type){}
 
    public bool Evaluar()
   {
+    try
+    {
+      
     if (Value == "&&")
     {
-    return ((tokenBul)tokens[0]).Evaluar() && ((tokenBul)tokens[1]).Evaluar();
+      try
+      {
+        return bool.Parse(tokens[0].Evaluar()) && bool.Parse(tokens[1].Evaluar());
+      }
+      catch (System.Exception)
+      {
+        if ( tokens[1].TypeReturn == TokenTypes.Number || tokens[1].TypeReturn == TokenTypes.Literal  && tokens[0].TypeReturn == TokenTypes.Number || tokens[0].TypeReturn == TokenTypes.Literal)
+        {
+          return true;
+        }
+        else if (tokens[1].TypeReturn == TokenTypes.Number || tokens[1].TypeReturn == TokenTypes.Literal)
+        {
+          return bool.Parse(tokens[0].Evaluar());
+        }
+        else if (tokens[0].TypeReturn == TokenTypes.Number || tokens[0].TypeReturn == TokenTypes.Literal)
+        {
+          return bool.Parse(tokens[1].Evaluar());
+        }
+        else
+        {
+          throw new ArgumentException("el operador " + Value + " no puede operar con estos elementos");
+        }
+      }
+     
     }
     else if (Value == "||")
     {
-    return ((tokenBul)tokens[0]).Evaluar() || ((tokenBul)tokens[1]).Evaluar();
+      try 
+      {
+        return bool.Parse(tokens[0].Evaluar()) || bool.Parse(tokens[1].Evaluar());
+      }
+       catch (System.Exception)
+      {
+        if(tokens[0].TypeReturn == TokenTypes.Number || tokens[0].TypeReturn == TokenTypes.Literal || tokens[1].TypeReturn == TokenTypes.Number || tokens[1].TypeReturn == TokenTypes.Literal )
+        {
+          return true ;
+        }
+        else
+        {
+          throw new ArgumentException("el operador " + Value + " no puede operar con estos elementos");
+        }
+      }
     }
     else if (Value == "!=")
     {
-    return double. Parse(tokens[0].Evaluar()) != double.Parse(tokens[1].Evaluar()); 
+       try
+      {
+         return tokens[0].Evaluar() != tokens[1].Evaluar();
+      }
+      catch (System.Exception)
+      {
+        
+        return false ;
+      }
     }
     else if (Value == ">")
     {
@@ -390,7 +469,16 @@ public class  tokenBul : token
     }
     else if (Value == "==" )
     {
-    return double. Parse (tokens[0].Evaluar()) == double.Parse(tokens[1].Evaluar());
+      try
+      {
+         return tokens[0].Evaluar() == tokens[1].Evaluar();
+      }
+      catch (System.Exception)
+      {
+        
+        return false ;
+      }
+    
     }
     else if (Value == ">=" )
     {
@@ -399,6 +487,12 @@ public class  tokenBul : token
     else  
     {
      return double. Parse (tokens[0].Evaluar()) <= double.Parse(tokens[1].Evaluar());
+    }
+    }
+    catch (System.Exception)
+    {
+      
+      throw new ArgumentException("el operador " + Value + " no puede trabajar con elementos de tipo distinto");
     }
     
   }
@@ -416,7 +510,7 @@ public class  tokenBul : token
     bool check = false ;
     bool check1 = false;
     check = tokens[0].CheckSemantic(errors);
-    if(tokens.Count != 0)
+    if(tokens.Count == 0)
     {
         errors.Add(new Errors(ErrorCode.Semantic , "error en la operacion " + Value + " parametros incorrectos" ));
         return false ;
@@ -431,26 +525,36 @@ public class  tokenBul : token
       errors.Add(new Errors(ErrorCode.Semantic , "error en la operacion " + Value ));
       
     }
-    else if(tokens[0].Type != tokens[1].Type)
+    if(tokens[0].Type == TokenTypes.Identifier)
     {
-       errors.Add(new Errors(ErrorCode.Semantic , "error en la operacion " + Value + " no se puede efectuar esta operacion sobre tipos diferentes"));
+      tokens[0].TypeReturn = tokens[1].TypeReturn;
     }
-    
-    if(!(check && check1))
+     if(tokens[1].Type == TokenTypes.Identifier)
     {
-      TypeReturn = tokens[0].TypeReturn;
-      return true ;
+      tokens[1].TypeReturn = tokens[0].TypeReturn;
+    }
+    if (Value != "&&" && Value != "||" && Value != "!=" && Value != "==" && tokens[0].TypeReturn != tokens[1].TypeReturn )
+    {
+      errors.Add(new Errors(ErrorCode.Semantic , "el operador " + Value + " solo opera con typos numeros"));
+      return false ;
+    }
+    if(check && check1)
+    {
+      if(Value == "==" && Value == "!=")
+      TypeReturn = TokenTypes.comparacion;
+      TypeReturn = TokenTypes.boolean;
+      return true;
     }
     else
     {
-         TypeReturn = TokenTypes.ErrorType;
-         return false ;
+      TypeReturn = TokenTypes.ErrorType;
+      return false ;
     }
   }
-}
-//esta clase es para parsear expresiones aritmeticas dado una lista de tokens 
-public class FunctionNode : token
-{
+ }
+  //funciones como sen , cos ....
+  public class FunctionNode : token
+ {
     public string FunctionName { get; set; }
     public FunctionNode (string FunctionName , TokenTypes type ):base (FunctionName , type){}
     
@@ -497,18 +601,19 @@ public class FunctionNode : token
         return true ;
       }
     }
-}
-    
-public class FunctionHulk :Parser
-{
-    List<token> parametros {get ; set ;}
+ }
+  //funciones definidas en el lenguaje
+  public class FunctionHulk :Parser
+ {
+    public int FuncionGuardada {get ; set ;}
     public FunctionHulk(String Value , TokenTypes Type , Parser root) : base(Value , Type , root)
     {
-        parametros = new List<token>();
+      FuncionGuardada = 0;
     }
     public FunctionHulk Clone ()
     {
       FunctionHulk objeto = new FunctionHulk(this.Value , this.Type , this.Root);
+      objeto.FuncionGuardada = this.FuncionGuardada;
       objeto.tokens = new List<token>();
       foreach (token item in this.tokens)
       {
@@ -527,11 +632,11 @@ public class FunctionHulk :Parser
      
       return objeto;
     }
-   public string Evaluar()
+    public string Evaluar()
     {
       if (Root.variablesLocales.Any(valor => valor .Value ==  Value))
       {
-        FunctionHulk actual = (FunctionHulk)Root.variablesLocales.Find(valor => valor.Value == Value).Clone();
+        FunctionHulk actual = (FunctionHulk)Root.variablesLocales[FuncionGuardada].Clone();
         actual.variablesGlobales = new List<token>(Root.variablesLocales);
         actual.tokens = CambioDPadre(actual.tokens , actual);
         for (int i = 0; i < variablesLocales.Count; i++)
@@ -541,9 +646,9 @@ public class FunctionHulk :Parser
         actual.CambioDevariable2(actual.tokens , actual.variablesLocales);
         return actual.tokens[0].Evaluar();
       }
-      else if (Root.variablesGlobales.Any(valor => valor.Value ==  Value ))
+      else 
       {
-        FunctionHulk actual = (FunctionHulk)((FunctionHulk)Root.variablesGlobales.Find(valor => valor.Value == Value)).Clone();
+        FunctionHulk actual = (FunctionHulk) Root.variablesGlobales[FuncionGuardada].Clone();
          actual.tokens = CambioDPadre(actual.tokens , actual);
          actual.variablesGlobales.Add((FunctionHulk)Root.variablesGlobales.Find(valor => valor.Value ==  Value).Clone());
 
@@ -556,10 +661,7 @@ public class FunctionHulk :Parser
          actual.CambioDevariable2(actual.tokens, actual.variablesLocales);
         return actual.tokens[0].Evaluar();
       }
-      else
-      {
-        throw new ArgumentException("esta funcion no fue definida en este lenguaje");
-      }
+     
       
     }
     private token CambioDevariable(token token , token varible)
@@ -578,7 +680,7 @@ public class FunctionHulk :Parser
           auxiliar.tokens[i] = (token)token.Clone();
         }
       }
-       token auxiliar2 = (token)token.Clone();
+        token auxiliar2 = (token)token.Clone();
         auxiliar2.tokens = new List<token>();
         auxiliar2.tokens.Add(new tokenNumero (auxiliar.Evaluar().ToString(), TokenTypes.Number));
         return auxiliar2;
@@ -621,16 +723,17 @@ public class FunctionHulk :Parser
     }
     public bool CheckSemantic(List<Errors> errors)
     {
-      bool cuerpo = false;
+      bool cuerpo = true;
       bool variablesL = true;
-      bool variablesG = true ;
+    
+      if(tokens.Count > 0)
+      {
       cuerpo = tokens[0].CheckSemantic(errors);
       if(!cuerpo)
       {
         errors.Add(new Errors(ErrorCode.Semantic , "error en la funcion " + Value ));
-      
       }
-     
+      }
       foreach (var item in variablesLocales)
       {
         variablesL = variablesL && item.CheckSemantic(errors);
@@ -639,29 +742,50 @@ public class FunctionHulk :Parser
           errors.Add(new Errors(ErrorCode.Semantic , "error en la funcion " + Value + "error en las variables locales"));
         }
       }
-      foreach (var item1 in variablesLocales)
-      {
-        foreach (var item in tokens)
-       {
-        if(item1.Value == item.Value) item1.TypeReturn = item.TypeReturn;
-        break;
-       }
-      }
-    if(cuerpo && variablesG)
+     inferencia(tokens);
+      
+    if(cuerpo && variablesL)
     {
+      if(tokens.Count > 0 && tokens[0].TypeReturn != TokenTypes.Keyword )
       TypeReturn = tokens[0].TypeReturn;
+      else
+      {
+      TypeReturn = TokenTypes.Identifier;
+      }
       return true ;
+
     }
     else
     {
       TypeReturn = TokenTypes.ErrorType;
       return false ;
     }
-  }
 
-}
-public class LetIn : Parser
-{
+  }  
+  void inferencia (List<token> tokens)
+  {
+   if(tokens.Count == 0)return ;
+   foreach (var item1 in variablesLocales)
+      {
+        foreach (var item in tokens)
+       {
+         if(item1.Value == item.Value && item.TypeReturn != TokenTypes.Keyword)
+         {
+           item1.TypeReturn = item.TypeReturn;
+           break;
+         }
+         else
+         {
+           inferencia(item.tokens);
+         }
+       }
+      }
+      
+  }
+ }
+ //expresion let-in 
+  public class LetIn : Parser
+ {
     public LetIn(string Value, TokenTypes type, Parser Padre) : base(Value, type, Padre)
     {
       this.Value = "let";
@@ -691,7 +815,29 @@ public class LetIn : Parser
         errores.Add(new Errors(ErrorCode.Semantic, "hay error en la expresion let - in , error en la expresion let "));
         TypeReturn = TokenTypes.ErrorType;
       }
-     
+      foreach (var item in tokens)
+        {
+            if(variablesGlobales.Any(valor => valor.Value == item.Value) && item is FunctionHulk)
+            {
+                FunctionHulk auxiliar = (FunctionHulk)variablesGlobales.Find(valor => valor.Value == item.Value);
+
+                if(auxiliar.variablesLocales.Count != ((FunctionHulk)item).variablesLocales.Count)
+                {
+                    errores.Add(new Errors(ErrorCode.Semantic , "la funcion " + item.Value + " no cuenta con esa cantidad de parametros"));
+                }
+                else
+                {
+                    for (int i = 0; i < auxiliar.variablesLocales.Count; i++)
+                    {
+                        if(auxiliar.variablesLocales[i].TypeReturn != ((FunctionHulk)item).variablesLocales[i].TypeReturn)
+                        {
+                            errores.Add(new Errors(ErrorCode.Semantic , "En la funcion " + auxiliar.Value + " el parametro " + ((FunctionHulk)item).variablesLocales[i].Value + " recive un tipo incorrecto"));
+                        }
+                    }
+                }
+                
+            }
+    }
       if (!(expresion_in && expresion_let))
       {
         return false ;
@@ -723,7 +869,7 @@ public class LetIn : Parser
     {
       return tokens[0].Evaluar();
     } 
-}
+ }
 }
 
 

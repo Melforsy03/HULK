@@ -1,12 +1,14 @@
-﻿using AST;
+﻿using System.IO;
+using System;
+using AST;
 using Usuario;
 using System.Text.RegularExpressions;
 namespace Tokenizador
 {
     public class input 
     {
-    public  static List<token> TokenizeString(string input)
-    {
+      public  static List<token> TokenizeString(string input)
+     {
         List<token> tokens = new List<token>();
         string currentToken = "";
         bool literal = false ;
@@ -23,20 +25,23 @@ namespace Tokenizador
                 literal = true ;
                 continue;
             }
+            //caracteres no definidos en el lenguaje
             if(CaracteresNoDefinidos(currentChar))
             {
                 throw new ArgumentException("el caracter" + currentChar + "no esta definido en este lenguaje");
             }
+            //operadores
             if (IsOperator(currentChar.ToString()))
             {
                     tokens.Add(new token(currentChar.ToString(), TokenTypes.Operator));
                     currentToken = "";
                     continue;
             }
+            //signos de puntuacion
             else if (IsPunctuation(currentChar.ToString()))
             {
                 
-                if (currentChar == '=' && input[i + 1] == '>' )
+                if ( i + 1 < input.Length && currentChar == '=' && input[i + 1] == '>' )
                 {
                     tokens.Add(new token("=>" , TokenTypes.Punctuation));
                     currentToken = "";
@@ -50,16 +55,23 @@ namespace Tokenizador
                     i++;
                     continue;
                 }
-                else if (currentChar == '>' && input [i + 1] == '=')
+                else if (i + 1 < input.Length - 1 && currentChar == '>' && input [i + 1] == '=')
                 {
                     tokens.Add(new token(">=" , TokenTypes.Punctuation));
                     currentToken = "";
                     i++;
                     continue;
                 }
-                else if (currentChar == '=' && input [i + 1] == '=')
+                else if (i + 1 < input.Length && currentChar == '=' && input [i + 1] == '=')
                 {
                     tokens.Add(new token("==" , TokenTypes.Punctuation));
+                    currentToken = "";
+                    i++;
+                    continue;
+                }
+                 else if (i + 1 < input.Length && currentChar == '!' && input [i + 1] == '=')
+                {
+                    tokens.Add(new token("!=" , TokenTypes.Punctuation));
                     currentToken = "";
                     i++;
                     continue;
@@ -84,7 +96,7 @@ namespace Tokenizador
                        currentToken += input[j];
                        continue;
                     }
-                    if(literal)
+                    if(literal || currentToken == "true" || currentToken == "false")
                     {
                         literal = false ;
                          tokens.Add(new tokenLiteral (currentToken , TokenTypes.Literal));
@@ -108,18 +120,35 @@ namespace Tokenizador
                     }
                      else if (double.TryParse(currentToken ,out double value ))
                     {
+                    if (tokens.Count >= 2 &&tokens[tokens.Count - 1].Value == "-" && tokens[tokens.Count - 2].Type != TokenTypes.Number && tokens[tokens.Count - 2].Value != ")" && tokens[tokens.Count - 2].Type != TokenTypes.Identifier )
+                    {
+                        tokens[tokens.Count - 1] = new tokenNumero("-" + currentToken , TokenTypes.Number);
+                        i = j ;
+                        currentToken  = "";
+                        break;
+                    }
+                    else
+                    {
                     tokens.Add(new tokenNumero(currentToken ,TokenTypes.Number));
                     i = j ;
                     currentToken  = "";
                     break;
                     }
-                    else
+                    }
+                    else if(currentToken == "PI")
+                      {
+                        tokens.Add(new tokenNumero(Math.PI.ToString(), TokenTypes.Number));
+                        i = j;
+                        currentToken = "";
+                        break ;
+                      }
+                      else
                     {
                       tokens.Add(new Identificador (currentToken , TokenTypes.Identifier));
                       i = j;
                       currentToken = "";
                       break;
-                    }
+                      }
                   }
                     if (IsOperator(input[i].ToString()))
                     {
@@ -133,9 +162,9 @@ namespace Tokenizador
                     }
             }
                
-        }
-    return tokens ;          
-}
+         }
+          return tokens ;          
+      }
     
    public static bool IsOperator(string c)
     {
@@ -144,7 +173,7 @@ namespace Tokenizador
 
   public static bool IsPunctuation(string c)
     {
-        return c == "." || c == "," || c == ";" || c == ":" || c == "\"" || c == "=>" || c == "=" || c == ">" || c == "<" || c == "<=" || c == "!=" || c == "==" || c == "(" || c == ")" || c == ">=";
+        return c == "." || c == "," || c == ";" || c == ":" || c == "\"" || c == "=>" || c == "=" || c == ">" || c == "<" || c == "<=" || c == "!=" || c == "==" || c == "(" || c == ")" || c == ">=" || c == "!";
     }
    public static bool IsKeyWords(string c )
     {
@@ -160,8 +189,8 @@ namespace Tokenizador
    }
  
   }
- public class Errors
-{
+  public class Errors
+ {
     public ErrorCode Code { get; private set; }
 
     public string Argument { get; private set; }
@@ -173,15 +202,15 @@ namespace Tokenizador
         this.Code = code;
         this.Argument = argument;
     }
-}
-public enum ErrorCode
-{
+ }
+  public enum ErrorCode
+ {
     Lexer,
     Sintaxis,
     Semantic,
     Any
 
-}
+ }
 
 }
 
