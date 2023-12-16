@@ -99,7 +99,7 @@ namespace Tokenizador
                     if(literal || currentToken == "true" || currentToken == "false")
                     {
                         literal = false ;
-                         tokens.Add(new tokenLiteral (currentToken , TokenTypes.Literal));
+                        tokens.Add(new tokenLiteral (currentToken , TokenTypes.Literal));
                         i = j ;
                         currentToken = "";
                         break;

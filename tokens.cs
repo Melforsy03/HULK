@@ -161,7 +161,12 @@ namespace AST
       TypeReturn = TokenTypes.ErrorType;
       return false ;
       }
-      TypeReturn = tokens[0].TypeReturn;
+       if (tokens[0].Value == "true" || tokens[0].Value == "true ")
+       TypeReturn = TokenTypes.boolean;
+       else
+       {
+       TypeReturn = tokens[0].TypeReturn;
+       }
       }
     else {TypeReturn = TokenTypes.Identifier;}
     return true ;
@@ -523,17 +528,44 @@ namespace AST
   {
     bool check = false ;
     bool check1 = false;
-    check = tokens[0].CheckSemantic(errors);
-    if(tokens.Count == 0)
+   
+    if(tokens.Count != 2 )
     {
         errors.Add(new Errors(ErrorCode.Semantic , "error en la operacion " + Value + " parametros incorrectos" ));
         return false ;
+    }
+    if (tokens[0].Type == TokenTypes.Number || tokens[0].Type == TokenTypes.Literal)
+    {
+      check = true ;
+      tokens[0].TypeReturn = tokens[0].Type;
+    }
+    else if(tokens[0].Value == "true" || tokens[0].Value == "false")
+    {
+      check = true ;
+      tokens[0].TypeReturn = TokenTypes.boolean;
+    }
+    else 
+    {
+    check = tokens[0].CheckSemantic(errors);
     }
      if(!check)
     {
       errors.Add(new Errors(ErrorCode.Semantic , "error en la operacion " + Value ));
     }
-     check1 = tokens[1].CheckSemantic(errors);
+    if (tokens[1].Type == TokenTypes.Number || tokens[1].Type == TokenTypes.Literal)
+    {
+      check1 = true ;
+      tokens[1].TypeReturn = tokens[1].Type;
+    }
+    else if(tokens[1].Value == "true" || tokens[1].Value == "false")
+    {
+      check1 = true ;
+      tokens[1].TypeReturn = TokenTypes.boolean;
+    }
+    else
+    {
+      check1 = tokens[1].CheckSemantic(errors);
+    }
      if(!check1)
     {
       errors.Add(new Errors(ErrorCode.Semantic , "error en la operacion " + Value ));
@@ -760,7 +792,7 @@ namespace AST
       
     if(cuerpo && variablesL)
     {
-      if(tokens.Count > 0 && tokens[0].TypeReturn != TokenTypes.Keyword )
+      if(tokens.Count > 0 && tokens[0].TypeReturn != TokenTypes.Keyword && !(tokens[0] is IfElseNode) )
       TypeReturn = tokens[0].TypeReturn;
       else
       {

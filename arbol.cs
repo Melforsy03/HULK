@@ -46,12 +46,13 @@ namespace Abol
     try
     {
      Parse();
-      position = 0;
+     position = 0 ;
     }
     catch (Exception ex)
     {
      Console.WriteLine(ex.Message);
     }
+   
   }
 
   public void Evaluate ()
@@ -157,7 +158,7 @@ namespace Abol
             else if (c == ">" || c == "<" || c == "<=" || c == ">=" ||  c == "!=" || c == "==" )
             {
                 position++;
-                token rigthNode = ParseTerm();
+                token rigthNode = ParseExpression();
                 tokenBul condicion = new tokenBul(c,TokenTypes.boolean);
                 condicion.tokens.Add(leftNode);
                 condicion.tokens.Add(rigthNode);
@@ -175,7 +176,7 @@ namespace Abol
             {
                 position++;
                 tokenBul condicion = new tokenBul(c,TokenTypes.boolean);
-                token rigthNode = ParseTerm();
+                token rigthNode = ParseExpression();
                 condicion.tokens.Add(leftNode);
                 condicion.tokens.Add(rigthNode);
              if (position < expression.Count &&( expression[position].Value == ")" || expression[position].Value == ";") )
@@ -599,20 +600,19 @@ namespace Abol
             bool correctos = true;
             foreach (FunctionHulk items in FuncionesGuardadas)
             {
+                correctos = true;
                 for (int i = 0; i < item.variablesLocales.Count; i++)
                 {
-                    if(items.variablesLocales[i].TypeReturn != TokenTypes.Identifier && item.variablesLocales[i].TypeReturn != item.variablesLocales[i].TypeReturn )
+                    if(items.variablesLocales[i].TypeReturn != TokenTypes.Identifier && items.variablesLocales[i].TypeReturn != item.variablesLocales[i].TypeReturn )
                     {
                         correctos = false;
                         break;
                     }
-                    else if( items.variablesLocales[i].TypeReturn != item.variablesLocales[i].TypeReturn)
+                    else if(items.variablesLocales[i].TypeReturn == TokenTypes.Identifier && item.variablesLocales[i].TypeReturn != TokenTypes.Literal && item.variablesLocales[i].TypeReturn != TokenTypes.Number && item.variablesLocales[i].TypeReturn != TokenTypes.Identifier)
                     {
-                        correctos= false ;
+                        correctos = false;
                         break ;
                     }
-                    correctos = true;
-                    break;
                 }
                  if (correctos)
                 {
@@ -620,7 +620,6 @@ namespace Abol
                     item.TypeReturn = items.TypeReturn;
                     return items;
                 }
-                
                 
             }
             if (!correctos)
@@ -631,7 +630,7 @@ namespace Abol
         }
         else 
         {
-             errors.Add(new Errors (ErrorCode.Semantic , "no existe la funcion "+ item.Value + " en este contexto"));
+             errors.Add(new Errors (ErrorCode.Semantic , "no existe la funcion "+ item.Value + " en este contexto que cumpla con los parametros"));
             
         }
     return null;
@@ -639,20 +638,25 @@ namespace Abol
    private void ErroresVariablesLocales()
    {
     bool Sobrecarga = true ;
+    
     for (int i = 0; i < variablesLocales.Count; i++)
-    {
+    {   
+        
         for (int j = i + 1; j < variablesLocales.Count; j++)
         {
             if (variablesLocales[i] is FunctionHulk && variablesLocales[j] is FunctionHulk && ((FunctionHulk)variablesLocales[i]).variablesLocales.Count == ((FunctionHulk)variablesLocales[j]).variablesLocales.Count)
             {
+                int count = ((FunctionHulk)variablesLocales[i]).variablesLocales.Count;
+                int count1 = ((FunctionHulk)variablesLocales[j]).variablesLocales.Count;
                 for (int k = 0; k < ((FunctionHulk)variablesLocales[i]).variablesLocales.Count ; k++)
                 {
                     if (((FunctionHulk)variablesLocales[i]).variablesLocales[k].TypeReturn != ((FunctionHulk)variablesLocales[j]).variablesLocales[k].TypeReturn)
                     {
-                        Sobrecarga = false ;
+                        Sobrecarga = false;
+                        break;
                     }
                 }
-                if(Sobrecarga)
+                if(Sobrecarga && count == count1)
                 {
                     errors.Add(new Errors (ErrorCode.Semantic ,"la funcion " + variablesLocales[i].Value + " fue definida mas de una vez en este contexto"));
                 }

@@ -17,7 +17,7 @@ namespace Usuario
             if(a == "") break;
             ganma.expression = Tokenizador.input.TokenizeString(a);
             ganma.construir();
-            
+        
           }
           ganma.Evaluate();
         }
