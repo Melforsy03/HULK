@@ -241,7 +241,6 @@ namespace AST
     bool condicion = false;
     bool then = false;
     bool elsse = false ;
-
     condicion = tokens[0].CheckSemantic(errors);
     if(!condicion)
     {
@@ -350,7 +349,7 @@ namespace AST
   {
     bool check = false ;
     bool check1 = false;
-     if(tokens.Count == 0)
+     if(tokens.Count != 2 || tokens[0] is null || tokens[1] is null )
     {
         errors.Add(new Errors(ErrorCode.Semantic , "error en la operacion " + Value + " parametros incorrectos" ));
         TypeReturn = TokenTypes.ErrorType;
@@ -449,15 +448,23 @@ namespace AST
     }
     else if (Value == "!=")
     {
-       try
-      {
-         return tokens[0].Evaluar() != tokens[1].Evaluar();
-      }
-      catch (System.Exception)
-      {
-        
-        return false ;
-      }
+      
+        string left = "";
+        if (tokens[0] is tokenBul)
+        left = tokens[0].Evaluar().ToString();
+        else
+        {
+        left = tokens[0].Evaluar();
+        }
+        string rigth = "";
+        if (tokens[1] is tokenBul )
+          rigth = tokens[1].Evaluar().ToString();
+        else
+        {
+           rigth = tokens[1].Evaluar();
+        }
+         return left != rigth;
+      
     }
     else if (Value == ">")
     {
@@ -469,15 +476,22 @@ namespace AST
     }
     else if (Value == "==" )
     {
-      try
-      {
-         return tokens[0].Evaluar() == tokens[1].Evaluar();
-      }
-      catch (System.Exception)
-      {
-        
-        return false ;
-      }
+     
+       string left = "";
+        if (tokens[0] is tokenBul)
+        left = tokens[0].Evaluar().ToString();
+        else
+        {
+        left = tokens[0].Evaluar();
+        }
+        string rigth = "";
+        if (tokens[1] is tokenBul )
+          rigth = tokens[1].Evaluar().ToString();
+        else
+        {
+           rigth = tokens[1].Evaluar();
+        }
+         return left == rigth;
     
     }
     else if (Value == ">=" )

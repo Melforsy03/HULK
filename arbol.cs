@@ -33,14 +33,8 @@ namespace Abol
         {
             item.CheckSemantic(errors);
         }
-        try
-        {
-            ErroresVariablesLocales();
-        }
-        catch (Exception x)
-        {
-            Console.WriteLine(x.Message);
-        }
+        
+        ErroresVariablesLocales();
         
         InferenciaSobrecarga(tokens);
         if(errors.Count == 0)return true;
@@ -377,6 +371,8 @@ namespace Abol
         position++;
       }
       token condicion = ParseExpression();
+      if (condicion == null)
+      throw new ArgumentException("la condicion del if no puede ser nula");
       IfElse.tokens.Add(condicion);
        if (expression[position].Value != ")")
        {
@@ -389,6 +385,8 @@ namespace Abol
         }
       //parsea el cuerpo then 
       token then = ParseExpression();
+       if (then == null)
+      throw new ArgumentException("la expresion then  del if no puede ser nula");
       IfElse.tokens.Add(then);
       //parsea el cuerpo Else
       if (expression[position].Value != "else")
@@ -397,6 +395,8 @@ namespace Abol
       }
       position++;
       token Else = ParseExpression();
+       if (Else == null)
+      throw new ArgumentException("la expresion else del if no puede ser nula");
       if ( position > expression.Count - 1 )
        {
             throw new ArgumentException("esperabamos un ;");
@@ -539,7 +539,7 @@ namespace Abol
         throw new ArgumentException("esperabamos un ;");
         parentesis = Funcion.parentesis;
         return Funcion;
-   }
+  }
 
    private void InferenciaSobrecarga(List <token> tokens)
    {
@@ -603,15 +603,15 @@ namespace Abol
                 {
                     if(items.variablesLocales[i].TypeReturn != TokenTypes.Identifier && item.variablesLocales[i].TypeReturn != item.variablesLocales[i].TypeReturn )
                     {
-                        correctos = false ;
+                        correctos = false;
                         break;
                     }
-                    else if( items.TypeReturn != item.variablesLocales[i].TypeReturn)
+                    else if( items.variablesLocales[i].TypeReturn != item.variablesLocales[i].TypeReturn)
                     {
                         correctos= false ;
                         break ;
                     }
-                    correctos = true ;
+                    correctos = true;
                     break;
                 }
                  if (correctos)
@@ -654,7 +654,7 @@ namespace Abol
                 }
                 if(Sobrecarga)
                 {
-                    throw new ArgumentException( "la funcion " + variablesLocales[i].Value + " fue definida mas de una vez en este contexto");
+                    errors.Add(new Errors (ErrorCode.Semantic ,"la funcion " + variablesLocales[i].Value + " fue definida mas de una vez en este contexto"));
                 }
             }
         }
